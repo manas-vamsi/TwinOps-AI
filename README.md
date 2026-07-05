@@ -57,7 +57,7 @@ pnpm install && pnpm dev    # web on :3000, api on :8000 — zero API keys neede
 | [ARCHITECTURE.md](ARCHITECTURE.md) | The complete system design — the single source of truth |
 | [DEVELOPMENT_ROADMAP.md](DEVELOPMENT_ROADMAP.md) | Phases P0–P5 with demoable exit criteria |
 | [TECH_STACK.md](TECH_STACK.md) | Every technology, why it was chosen, what it costs ($0), when to revisit |
-| [CODING_STANDARDS.md](CODING_STANDARDS.md) | The rules the codebase follows |
+| [DEVELOPMENT_RULES.md](DEVELOPMENT_RULES.md) | The engineering rulebook every implementation follows |
 
 ## Design language
 

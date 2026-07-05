@@ -280,7 +280,7 @@ twinops-ai/
 ## 11. Cross-cutting quality bar
 
 - **Observability:** structlog JSON with request IDs; `/healthz` + `/readyz` (incl. ticker health); metrics: tick-lag, provider error rates, WS client count, detector fires, agent run duration/tokens; Sentry optional (default = self-contained logs).
-- **Error doctrine:** every failure mode has a named exception, a rescue action, and a user-visible state — see the Error & Rescue registry pattern in [CODING_STANDARDS.md](CODING_STANDARDS.md). No silent failures.
+- **Error doctrine:** every failure mode has a named exception, a rescue action, and a user-visible state — see the Error & Rescue registry pattern in [DEVELOPMENT_RULES.md](DEVELOPMENT_RULES.md). No silent failures.
 - **Performance budgets:** shell TTI <2.5s · 60fps canvas @200 nodes · WS apply <16ms · non-LLM API p95 <150ms.
 - **Testing:** sim determinism goldens, detector precision (8 scenarios, zero false positives on baseline), state-machine transitions, per-provider structured-output contract tests (recorded cassettes — CI never calls live LLMs), RCA golden-truth eval (≥7/8 scenarios), RAG citation integrity, WS seq/re-snapshot property tests, replay=live equality, 3 Playwright journeys.
 - **Rollback posture:** Vercel instant rollback; API = previous image; Alembic downgrade per migration.

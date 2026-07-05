@@ -17,7 +17,7 @@ Six phases. Every phase ends with a **demoable exit criterion** (a sentence you 
 ## Definition of done (every phase)
 
 - Exit criterion demonstrated, not asserted
-- Phase's Playwright journey green in CI; unit/integration tests for new logic (see test plan in [CODING_STANDARDS.md](CODING_STANDARDS.md#testing))
+- Phase's Playwright journey green in CI; unit/integration tests for new logic (see testing strategy in [DEVELOPMENT_RULES.md](DEVELOPMENT_RULES.md#9-testing-strategy))
 - No silent failures introduced (error registry updated)
 - ADR written for any architectural decision made in the phase (`docs/adr/`)
 - Docs in this repo still true (stale docs = a bug)
