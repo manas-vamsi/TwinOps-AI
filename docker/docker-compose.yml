@@ -1,0 +1,43 @@
+# TwinOps AI — local canonical runtime (Profile A, $0)
+# Usage from repo root:  docker compose -f docker/docker-compose.yml up -d
+name: twinops
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: twinops
+      POSTGRES_PASSWORD: twinops
+      POSTGRES_DB: twinops
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U twinops -d twinops"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  valkey:
+    image: valkey/valkey:8-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    # Model is pulled once by scripts/dev-setup (default: qwen2.5:3b).
+    # 8 GB RAM machines: keep the 3B model. 16 GB+: try qwen2.5:7b.
+
+volumes:
+  pgdata:
+  ollama:
