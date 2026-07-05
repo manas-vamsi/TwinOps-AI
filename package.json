@@ -1,0 +1,16 @@
+{
+  "name": "twinops-ai",
+  "private": true,
+  "packageManager": "pnpm@11.10.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @twinops/web dev",
+    "build": "pnpm --filter @twinops/web build",
+    "lint": "pnpm --filter @twinops/web lint",
+    "typecheck": "pnpm --filter @twinops/web typecheck",
+    "test": "pnpm --filter @twinops/web test",
+    "contracts": "pnpm --filter @twinops/contracts generate"
+  }
+}
