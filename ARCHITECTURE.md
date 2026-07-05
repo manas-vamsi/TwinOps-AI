@@ -54,7 +54,7 @@ One frontend, one backend deployable, three stores, one external dependency clas
 
 ## 2. Frontend architecture
 
-**Stack:** Next.js 15 (App Router) · React 19 · TypeScript strict · Tailwind CSS 4 + shadcn/ui · Framer Motion · React Flow + elkjs · Zustand + TanStack Query · generated OpenAPI client.
+**Stack:** Next.js 16 (App Router) · React 19 · TypeScript strict · Tailwind CSS 4 + shadcn/ui · Framer Motion · React Flow + elkjs · Zustand + TanStack Query · generated OpenAPI client.
 
 **Rendering:** the authenticated app is one client-heavy shell. Server components render shell chrome + bootstrap payloads; everything interactive is client components. Route groups: `(auth)`, `(shell)` for the eight product pages.
 
@@ -270,11 +270,12 @@ twinops-ai/
 │   └── api/                          # FastAPI (see §3 structure)
 ├── packages/contracts/               # exported OpenAPI json + generated TS client
 ├── data/
-│   ├── corpus/                       # RAG source docs (runbooks, playbooks…)
-│   └── scenarios/                    # failure scenario YAML
-├── infra/docker-compose.yml          # postgres + valkey + ollama
+│   ├── corpus/                       # RAG source docs (runbooks, playbooks…) — lands P3
+│   └── scenarios/                    # failure scenario YAML — lands P1
+├── docker/docker-compose.yml         # postgres + valkey + ollama (+ Dockerfiles later)
+├── scripts/                          # dev-setup · generate-contracts · seed · demo (thin)
 ├── docs/{adr/, assets/}              # ADR-001… · brand assets
-└── .github/workflows/ci.yml          # lint · typecheck · test · build · contract-gen
+└── .github/workflows/ci.yml          # lint · typecheck · test · build · contract-drift
 ```
 
 ## 11. Cross-cutting quality bar

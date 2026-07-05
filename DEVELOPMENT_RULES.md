@@ -27,7 +27,8 @@ twinops-ai/
 │       └── modules/<name>/       # router.py · service.py · repo.py · schemas.py (+ tests/)
 ├── packages/contracts/           # exported openapi.json + generated TS types
 ├── data/corpus/                  # RAG source markdown        data/scenarios/  # failure YAML
-├── infra/                        # docker-compose.yml, deploy configs
+├── docker/                       # docker-compose.yml, Dockerfiles, ollama init
+├── scripts/                      # thin entry points: dev-setup, generate-contracts, seed, demo
 └── docs/adr/                     # NNN-title.md decision records   docs/assets/  # brand
 ```
 

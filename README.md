@@ -6,7 +6,7 @@
 
 *A real-time Digital Twin of enterprise infrastructure with explainable, multi-agent AI operations — detection, root-cause analysis, prediction, and remediation guidance with evidence you can audit.*
 
-`Status: 🚧 In development — Phase 0 (Foundation)` · [Roadmap](DEVELOPMENT_ROADMAP.md)
+`Status: 🚧 In development — Phase 0 complete, Phase 1 (Twin + Simulation) next` · [Roadmap](DEVELOPMENT_ROADMAP.md)
 
 </div>
 
@@ -41,13 +41,16 @@ Deterministic core, LLMs at the edges. Full design, diagrams, and every decision
 
 The entire MVP builds and runs free, offline, on one laptop — `docker compose up` brings up Postgres, Valkey, and Ollama; no paid API key is ever required to boot (paid providers activate automatically when a key exists). Details: [TECH_STACK.md](TECH_STACK.md).
 
-**Planned developer experience (Phase 0 target):**
+**Getting started (zero API keys needed):**
 
 ```bash
 git clone https://github.com/manas-vamsi/TwinOps-AI && cd TwinOps-AI
-docker compose up -d        # postgres + valkey + ollama (small model auto-pulled)
-pnpm install && pnpm dev    # web on :3000, api on :8000 — zero API keys needed
+bash scripts/dev-setup.sh        # .env + postgres/valkey/ollama + deps  (Windows: .\scripts\dev-setup.ps1)
+pnpm dev                         # web  → http://localhost:3000
+cd apps/api && uv run uvicorn twinops.main:app --reload   # api → http://localhost:8000/healthz
 ```
+
+Prereqs: Node 22+, pnpm, [uv](https://docs.astral.sh/uv/), Docker.
 
 ## Documentation
 
