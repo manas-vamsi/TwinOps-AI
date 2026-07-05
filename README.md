@@ -65,4 +65,4 @@ Pure black + charcoal surfaces, luxury gold accents, emerald for healthy, crimso
 
 ---
 
-<div align="center"><sub>Built by <a href="https://github.com/manas-vamsi">Sanjay</a> · TwinOps AI · Intelligent · Predictive · Reliable</sub></div>
+<div align="center"><sub>Built by <a href="https://github.com/manas-vamsi">Manas</a> · TwinOps AI · Intelligent · Predictive · Reliable</sub></div>
