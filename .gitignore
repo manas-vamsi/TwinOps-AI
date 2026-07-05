@@ -1,0 +1,40 @@
+# --- secrets: never committed (DEVELOPMENT_RULES §12) ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# --- node / web ---
+node_modules/
+.next/
+out/
+dist/
+coverage/
+*.tsbuildinfo
+.eslintcache
+
+# --- python / api ---
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+htmlcov/
+
+# --- local runtime state ---
+*.log
+.chroma/
+playwright-report/
+test-results/
+
+# --- editors & OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- assistant local config (machine-specific) ---
+.claude/settings.local.json
+.gstack/
