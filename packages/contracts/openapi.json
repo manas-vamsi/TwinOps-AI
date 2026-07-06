@@ -54,6 +54,371 @@
           }
         }
       }
+    },
+    "/api/v1/twin/graph": {
+      "get": {
+        "tags": [
+          "twin"
+        ],
+        "summary": "Get Graph",
+        "description": "Full snapshot: nodes + edges + current health (\u00a74 snapshot+delta).",
+        "operationId": "get_graph_api_v1_twin_graph_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GraphSnapshot"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/simulation/scenarios": {
+      "get": {
+        "tags": [
+          "twin"
+        ],
+        "summary": "List Scenarios",
+        "operationId": "list_scenarios_api_v1_simulation_scenarios_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Scenario"
+                  },
+                  "type": "array",
+                  "title": "Response List Scenarios Api V1 Simulation Scenarios Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/simulation/inject/{scenario_id}": {
+      "post": {
+        "tags": [
+          "twin"
+        ],
+        "summary": "Inject",
+        "operationId": "inject_api_v1_simulation_inject__scenario_id__post",
+        "parameters": [
+          {
+            "name": "scenario_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Scenario Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GraphSnapshot"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/simulation/reset": {
+      "post": {
+        "tags": [
+          "twin"
+        ],
+        "summary": "Reset",
+        "operationId": "reset_api_v1_simulation_reset_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GraphSnapshot"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "GraphSnapshot": {
+        "properties": {
+          "topology_hash": {
+            "type": "string",
+            "title": "Topology Hash"
+          },
+          "tick": {
+            "type": "integer",
+            "title": "Tick"
+          },
+          "active_scenario_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Scenario Id"
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/TwinNode"
+            },
+            "type": "array",
+            "title": "Nodes"
+          },
+          "edges": {
+            "items": {
+              "$ref": "#/components/schemas/TwinEdge"
+            },
+            "type": "array",
+            "title": "Edges"
+          },
+          "health": {
+            "items": {
+              "$ref": "#/components/schemas/NodeHealth"
+            },
+            "type": "array",
+            "title": "Health"
+          }
+        },
+        "type": "object",
+        "required": [
+          "topology_hash",
+          "tick",
+          "active_scenario_id",
+          "nodes",
+          "edges",
+          "health"
+        ],
+        "title": "GraphSnapshot",
+        "description": "Full state a client needs to render the twin (REST snapshot, \u00a74 pattern)."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "Metrics": {
+        "properties": {
+          "cpu": {
+            "type": "number",
+            "title": "Cpu"
+          },
+          "memory": {
+            "type": "number",
+            "title": "Memory"
+          },
+          "latency_p95": {
+            "type": "integer",
+            "title": "Latency P95"
+          },
+          "error_rate": {
+            "type": "number",
+            "title": "Error Rate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cpu",
+          "memory",
+          "latency_p95",
+          "error_rate"
+        ],
+        "title": "Metrics"
+      },
+      "NodeHealth": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "score": {
+            "type": "number",
+            "title": "Score"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "healthy",
+              "degraded",
+              "critical"
+            ],
+            "title": "Status"
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/Metrics"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "score",
+          "status",
+          "metrics"
+        ],
+        "title": "NodeHealth"
+      },
+      "Scenario": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "origin": {
+            "type": "string",
+            "title": "Origin"
+          },
+          "blurb": {
+            "type": "string",
+            "title": "Blurb"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "origin",
+          "blurb"
+        ],
+        "title": "Scenario"
+      },
+      "TwinEdge": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "target": {
+            "type": "string",
+            "title": "Target"
+          }
+        },
+        "type": "object",
+        "required": [
+          "source",
+          "target"
+        ],
+        "title": "TwinEdge"
+      },
+      "TwinNode": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "load-balancer",
+              "gateway",
+              "service",
+              "database",
+              "queue",
+              "cache",
+              "cloud"
+            ],
+            "title": "Kind"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "tier": {
+            "type": "integer",
+            "title": "Tier"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "label",
+          "tier"
+        ],
+        "title": "TwinNode"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
     }
   }
 }

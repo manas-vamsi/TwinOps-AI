@@ -44,10 +44,174 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/twin/graph": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Graph
+         * @description Full snapshot: nodes + edges + current health (§4 snapshot+delta).
+         */
+        get: operations["get_graph_api_v1_twin_graph_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/simulation/scenarios": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Scenarios */
+        get: operations["list_scenarios_api_v1_simulation_scenarios_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/simulation/inject/{scenario_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Inject */
+        post: operations["inject_api_v1_simulation_inject__scenario_id__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/simulation/reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reset */
+        post: operations["reset_api_v1_simulation_reset_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: never;
+    schemas: {
+        /**
+         * GraphSnapshot
+         * @description Full state a client needs to render the twin (REST snapshot, §4 pattern).
+         */
+        GraphSnapshot: {
+            /** Topology Hash */
+            topology_hash: string;
+            /** Tick */
+            tick: number;
+            /** Active Scenario Id */
+            active_scenario_id: string | null;
+            /** Nodes */
+            nodes: components["schemas"]["TwinNode"][];
+            /** Edges */
+            edges: components["schemas"]["TwinEdge"][];
+            /** Health */
+            health: components["schemas"]["NodeHealth"][];
+        };
+        /** HTTPValidationError */
+        HTTPValidationError: {
+            /** Detail */
+            detail?: components["schemas"]["ValidationError"][];
+        };
+        /** Metrics */
+        Metrics: {
+            /** Cpu */
+            cpu: number;
+            /** Memory */
+            memory: number;
+            /** Latency P95 */
+            latency_p95: number;
+            /** Error Rate */
+            error_rate: number;
+        };
+        /** NodeHealth */
+        NodeHealth: {
+            /** Id */
+            id: string;
+            /** Score */
+            score: number;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "healthy" | "degraded" | "critical";
+            metrics: components["schemas"]["Metrics"];
+        };
+        /** Scenario */
+        Scenario: {
+            /** Id */
+            id: string;
+            /** Label */
+            label: string;
+            /** Origin */
+            origin: string;
+            /** Blurb */
+            blurb: string;
+        };
+        /** TwinEdge */
+        TwinEdge: {
+            /** Source */
+            source: string;
+            /** Target */
+            target: string;
+        };
+        /** TwinNode */
+        TwinNode: {
+            /** Id */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "load-balancer" | "gateway" | "service" | "database" | "queue" | "cache" | "cloud";
+            /** Label */
+            label: string;
+            /** Tier */
+            tier: number;
+        };
+        /** ValidationError */
+        ValidationError: {
+            /** Location */
+            loc: (string | number)[];
+            /** Message */
+            msg: string;
+            /** Error Type */
+            type: string;
+            /** Input */
+            input?: unknown;
+            /** Context */
+            ctx?: Record<string, never>;
+        };
+    };
     responses: never;
     parameters: never;
     requestBodies: never;
@@ -96,6 +260,97 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+        };
+    };
+    get_graph_api_v1_twin_graph_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GraphSnapshot"];
+                };
+            };
+        };
+    };
+    list_scenarios_api_v1_simulation_scenarios_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Scenario"][];
+                };
+            };
+        };
+    };
+    inject_api_v1_simulation_inject__scenario_id__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                scenario_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GraphSnapshot"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reset_api_v1_simulation_reset_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GraphSnapshot"];
                 };
             };
         };

@@ -7,6 +7,7 @@ from twinops.core.config import get_settings
 from twinops.core.health import router as health_router
 from twinops.core.logging import configure_logging
 from twinops.core.request_id import request_id_middleware
+from twinops.modules.twin.router import router as twin_router
 
 log = structlog.get_logger()
 
@@ -31,6 +32,7 @@ def create_app() -> FastAPI:
     app.middleware("http")(request_id_middleware)
 
     app.include_router(health_router)
+    app.include_router(twin_router)
 
     log.info("app_created", env=settings.env, version=__version__)
     return app
