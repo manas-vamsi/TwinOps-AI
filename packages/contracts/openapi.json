@@ -55,6 +55,28 @@
         }
       }
     },
+    "/api/v1/config": {
+      "get": {
+        "tags": [
+          "meta"
+        ],
+        "summary": "Get Config",
+        "description": "Honest F10 view: the app boots with any >=1 provider; Ollama needs no key.",
+        "operationId": "get_config_api_v1_config_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemConfig"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/twin/graph": {
       "get": {
         "tags": [
@@ -231,6 +253,120 @@
           }
         }
       }
+    },
+    "/api/v1/knowledge/search": {
+      "get": {
+        "tags": [
+          "knowledge"
+        ],
+        "summary": "Knowledge Search",
+        "operationId": "knowledge_search_api_v1_knowledge_search_get",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "Q"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SearchHit"
+                  },
+                  "title": "Response Knowledge Search Api V1 Knowledge Search Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/knowledge/docs": {
+      "get": {
+        "tags": [
+          "knowledge"
+        ],
+        "summary": "Knowledge Docs",
+        "operationId": "knowledge_docs_api_v1_knowledge_docs_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/KnowledgeDoc"
+                  },
+                  "type": "array",
+                  "title": "Response Knowledge Docs Api V1 Knowledge Docs Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/knowledge/docs/{doc_id}": {
+      "get": {
+        "tags": [
+          "knowledge"
+        ],
+        "summary": "Knowledge Doc",
+        "operationId": "knowledge_doc_api_v1_knowledge_docs__doc_id__get",
+        "parameters": [
+          {
+            "name": "doc_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Doc Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KnowledgeDoc"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -378,6 +514,29 @@
         ],
         "title": "Incident"
       },
+      "KnowledgeDoc": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "body": {
+            "type": "string",
+            "title": "Body"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "body"
+        ],
+        "title": "KnowledgeDoc"
+      },
       "Metrics": {
         "properties": {
           "cpu": {
@@ -437,6 +596,34 @@
           "metrics"
         ],
         "title": "NodeHealth"
+      },
+      "Provider": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "configured": {
+            "type": "boolean",
+            "title": "Configured"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "kind",
+          "configured"
+        ],
+        "title": "Provider"
       },
       "RootCause": {
         "properties": {
@@ -515,6 +702,60 @@
           "blurb"
         ],
         "title": "Scenario"
+      },
+      "SearchHit": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "snippet": {
+            "type": "string",
+            "title": "Snippet"
+          },
+          "score": {
+            "type": "integer",
+            "title": "Score"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "snippet",
+          "score"
+        ],
+        "title": "SearchHit"
+      },
+      "SystemConfig": {
+        "properties": {
+          "sim_seed": {
+            "type": "integer",
+            "title": "Sim Seed"
+          },
+          "workspace": {
+            "type": "string",
+            "title": "Workspace"
+          },
+          "providers": {
+            "items": {
+              "$ref": "#/components/schemas/Provider"
+            },
+            "type": "array",
+            "title": "Providers"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sim_seed",
+          "workspace",
+          "providers"
+        ],
+        "title": "SystemConfig"
       },
       "TwinEdge": {
         "properties": {
