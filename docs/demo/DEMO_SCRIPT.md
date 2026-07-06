@@ -67,8 +67,32 @@ Narration beats and timings below (~120s total). Speak to the "why," not just cl
 - Upload the MP4 to YouTube/Loom (unlisted) and paste the link into the README
   Demo section, or commit a compressed `.mp4` under `docs/assets/` if under ~50 MB.
 
-## Optional: hands-free recording
+## Hands-free recording (recommended)
 
-Want the demo to drive itself (so you just hit record)? Ask and I'll add a
-Playwright headed script that performs this exact choreography with pauses —
-then any screen recorder captures a perfect, repeatable take.
+`scripts/demo-drive.mjs` drives a real browser through this exact choreography
+with pauses and a visible red cursor, so you just start a recorder and let it
+run (~2 minutes, deterministic).
+
+**One-time setup:**
+```powershell
+pnpm install
+pnpm exec playwright install chromium
+```
+
+**Record:**
+```powershell
+# terminal 1 — backend
+cd apps/api ; uv run uvicorn twinops.main:app --reload
+# terminal 2 — frontend
+pnpm dev
+# terminal 3 — start your screen recorder, then:
+pnpm demo
+```
+
+A 1440×900 Chromium window opens and performs the demo: dashboard → twin →
+inject failure → cascade → node detail → incident root cause → agents →
+knowledge search → reset → dark-theme reveal. For the README GIF, just clip
+the ~7s cascade segment from the recording.
+
+Override the URL with `DEMO_URL=http://localhost:3001 pnpm demo` if the dev
+server picked a different port.

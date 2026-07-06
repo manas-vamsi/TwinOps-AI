@@ -11,6 +11,10 @@
     "lint": "pnpm --filter @twinops/web lint",
     "typecheck": "pnpm --filter @twinops/web typecheck",
     "test": "pnpm --filter @twinops/web test",
-    "contracts": "pnpm --filter @twinops/contracts generate"
+    "contracts": "pnpm --filter @twinops/contracts generate",
+    "demo": "node scripts/demo-drive.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.56.1"
   }
 }
