@@ -59,6 +59,8 @@ export function scoreToStatus(score: number): HealthStatus {
   return "critical";
 }
 
+import type { Incident } from "@/features/incidents/types";
+
 /** Wire types — what the server sends (snake_case, matches Pydantic schemas). */
 export interface WireMetrics {
   cpu: number;
@@ -79,9 +81,11 @@ export interface SnapshotPayload {
   nodes: TwinNodeSpec[];
   edges: TwinEdgeSpec[];
   health: WireHealth[];
+  incidents?: Incident[];
 }
 export interface DeltaPayload {
   tick: number;
   active_scenario_id: string | null;
   health: WireHealth[];
+  incidents?: Incident[];
 }

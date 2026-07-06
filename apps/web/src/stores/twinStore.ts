@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import type { Incident } from "@/features/incidents/types";
 import type {
   DeltaPayload,
   NodeRuntime,
@@ -22,6 +23,7 @@ interface TwinState {
   nodes: TwinNodeSpec[];
   edges: TwinEdgeSpec[];
   runtime: Record<string, NodeRuntime>;
+  incidents: Incident[]; // open incidents, streamed live
   activeScenarioId: string | null;
   selectedNodeId: string | null;
   lastSeq: number;
@@ -53,6 +55,7 @@ export const useTwinStore = create<TwinState>((set) => ({
   nodes: [],
   edges: [],
   runtime: {},
+  incidents: [],
   activeScenarioId: null,
   selectedNodeId: null,
   lastSeq: 0,
@@ -68,6 +71,7 @@ export const useTwinStore = create<TwinState>((set) => ({
         nodes: p.nodes,
         edges: p.edges,
         runtime,
+        incidents: p.incidents ?? [],
         activeScenarioId: p.active_scenario_id,
         lastSeq: seq,
       };
@@ -77,7 +81,12 @@ export const useTwinStore = create<TwinState>((set) => ({
     set((s) => {
       const runtime = { ...s.runtime };
       for (const h of p.health) runtime[h.id] = toRuntime(h, s.runtime[h.id]);
-      return { runtime, activeScenarioId: p.active_scenario_id, lastSeq: seq };
+      return {
+        runtime,
+        incidents: p.incidents ?? [],
+        activeScenarioId: p.active_scenario_id,
+        lastSeq: seq,
+      };
     }),
 
   select: (nodeId) => set({ selectedNodeId: nodeId }),

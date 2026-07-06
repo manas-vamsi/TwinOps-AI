@@ -6,11 +6,10 @@ import { TwinCanvas } from "./TwinCanvas";
 import { TwinToolbar } from "./TwinToolbar";
 import { NodeDetailPanel } from "./NodeDetailPanel";
 import { HealthLegend } from "./HealthLegend";
-import { useTwinSocket } from "./useTwinSocket";
 
-/** Flagship surface: live dependency graph streamed from the server. */
+/** Flagship surface: live dependency graph streamed from the server.
+ *  The WebSocket is owned app-wide by RealtimeProvider (shell layout). */
 export function TwinView() {
-  useTwinSocket();
   const status = useTwinStore((s) => s.status);
   const hasData = useTwinStore((s) => s.nodes.length > 0);
 

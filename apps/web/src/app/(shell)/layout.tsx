@@ -1,6 +1,7 @@
 import { Sidebar } from "@/components/shell/Sidebar";
 import { TopBar } from "@/components/shell/TopBar";
 import { CommandPalette } from "@/components/shell/CommandPalette";
+import { RealtimeProvider } from "@/components/shell/RealtimeProvider";
 
 export default function ShellLayout({
   children,
@@ -13,6 +14,7 @@ export default function ShellLayout({
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
       <CommandPalette />
+      <RealtimeProvider />
     </div>
   );
 }
