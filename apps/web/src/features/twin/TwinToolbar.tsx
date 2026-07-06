@@ -1,0 +1,82 @@
+"use client";
+
+import { useState } from "react";
+import { ChevronDown, RotateCcw, Zap } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useTwinStore } from "@/stores/twinStore";
+import { SCENARIOS } from "./topology";
+
+/** Floating control surface over the canvas: inject a failure scenario
+ *  (the demo moment), reset, and a health legend. */
+export function TwinToolbar() {
+  const [open, setOpen] = useState(false);
+  const inject = useTwinStore((s) => s.inject);
+  const reset = useTwinStore((s) => s.reset);
+  const activeScenarioId = useTwinStore((s) => s.activeScenarioId);
+  const active = SCENARIOS.find((s) => s.id === activeScenarioId) ?? null;
+
+  return (
+    <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-3 p-4">
+      {/* left: title + live status */}
+      <div className="pointer-events-auto">
+        <h1 className="font-display text-lg font-semibold tracking-tight text-text">
+          Digital Twin
+        </h1>
+        <p className="mt-0.5 text-xs text-muted">
+          {active ? (
+            <span className="text-critical">● {active.blurb}</span>
+          ) : (
+            <span className="text-success">● All systems nominal</span>
+          )}
+        </p>
+      </div>
+
+      {/* right: inject + reset */}
+      <div className="pointer-events-auto flex items-center gap-2">
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setOpen((o) => !o)}
+            aria-expanded={open}
+            className="flex h-9 items-center gap-2 rounded-xl bg-accent px-3 text-sm font-medium text-cream transition-colors hover:bg-accent-strong"
+          >
+            <Zap className="size-4" aria-hidden />
+            Inject failure
+            <ChevronDown className="size-3.5 opacity-80" aria-hidden />
+          </button>
+          {open && (
+            <div className="absolute right-0 top-11 w-64 overflow-hidden rounded-xl border border-hairline bg-surface p-1 shadow-2xl shadow-black/20">
+              {SCENARIOS.map((s) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => {
+                    inject(s.id);
+                    setOpen(false);
+                  }}
+                  className={cn(
+                    "flex w-full flex-col gap-0.5 rounded-lg px-3 py-2 text-left transition-colors hover:bg-raised",
+                    s.id === activeScenarioId && "bg-accent-soft",
+                  )}
+                >
+                  <span className="text-[13px] font-medium text-text">{s.label}</span>
+                  <span className="text-[11px] text-faint">{s.blurb}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <button
+          type="button"
+          onClick={reset}
+          disabled={!activeScenarioId}
+          className="flex size-9 items-center justify-center rounded-xl border border-hairline bg-surface text-muted transition-colors hover:text-text disabled:opacity-40"
+          aria-label="Reset simulation"
+        >
+          <RotateCcw className="size-4" aria-hidden />
+        </button>
+      </div>
+    </div>
+  );
+}
