@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { BookOpen, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -23,16 +24,17 @@ export function KnowledgeView() {
   const [docs, setDocs] = useState<Doc[]>([]);
   const [hits, setHits] = useState<Hit[] | null>(null);
   const [selected, setSelected] = useState<Doc | null>(null);
+  const docParam = useSearchParams().get("doc");
 
   useEffect(() => {
     fetch(`${API_BASE}/api/v1/knowledge/docs`)
       .then((r) => (r.ok ? r.json() : []))
       .then((d: Doc[]) => {
         setDocs(d);
-        setSelected(d[0] ?? null);
+        setSelected(d.find((x) => x.id === docParam) ?? d[0] ?? null);
       })
       .catch(() => setDocs([]));
-  }, []);
+  }, [docParam]);
 
   useEffect(() => {
     const q = query.trim();

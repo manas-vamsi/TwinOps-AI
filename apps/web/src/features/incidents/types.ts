@@ -11,6 +11,7 @@ export interface RootCause {
   evidence: string[];
   recommended_actions: string[];
   estimated_recovery: string;
+  runbook_id: string | null;
 }
 
 export interface ReplayFrame {

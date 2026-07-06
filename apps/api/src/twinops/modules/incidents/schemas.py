@@ -17,6 +17,7 @@ class RootCause(BaseModel):
     evidence: list[str]
     recommended_actions: list[str]
     estimated_recovery: str
+    runbook_id: str | None  # matching knowledge-base runbook
 
 
 class Incident(BaseModel):

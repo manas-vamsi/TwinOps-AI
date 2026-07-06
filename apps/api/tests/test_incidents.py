@@ -18,6 +18,7 @@ def test_rca_infers_the_true_origin_not_the_cascade() -> None:
     assert rca.node_id == "db-orders-pg"
     assert rca.confidence >= 50
     assert rca.recommended_actions  # actions present
+    assert rca.runbook_id == "db-connection-pool-exhaustion"  # cites the runbook
 
 
 def test_rca_none_when_all_healthy() -> None:

@@ -19,6 +19,20 @@ _DEPS: dict[str, list[str]] = {n.id: [] for n in NODES}
 for _e in EDGES:
     _DEPS[_e.source].append(_e.target)
 
+# root cause -> the runbook that addresses it (corpus doc ids in data/corpus)
+_RUNBOOK_BY_KIND: dict[str, str] = {
+    "database": "db-connection-pool-exhaustion",
+    "cache": "cache-stampede",
+    "queue": "queue-backlog",
+}
+
+
+def _runbook_for(node_id: str, kind: str) -> str:
+    if node_id == "svc-payment":
+        return "payment-provider-latency"
+    return _RUNBOOK_BY_KIND.get(kind, "incident-response-playbook")
+
+
 _ACTIONS: dict[str, list[str]] = {
     "database": [
         "Increase connection pool size and cap slow queries",
@@ -93,4 +107,5 @@ def infer_root_cause(health: dict[str, NodeHealth]) -> RootCause | None:
         evidence=evidence,
         recommended_actions=actions,
         estimated_recovery="~5 minutes" if health[root].status == "critical" else "~2 minutes",
+        runbook_id=_runbook_for(root, _KIND[root]),
     )

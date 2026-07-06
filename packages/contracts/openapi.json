@@ -749,6 +749,17 @@
           "estimated_recovery": {
             "type": "string",
             "title": "Estimated Recovery"
+          },
+          "runbook_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Runbook Id"
           }
         },
         "type": "object",
@@ -759,7 +770,8 @@
           "summary",
           "evidence",
           "recommended_actions",
-          "estimated_recovery"
+          "estimated_recovery",
+          "runbook_id"
         ],
         "title": "RootCause",
         "description": "Deterministic root-cause verdict inferred from topology + health.\nConfidence is computed from evidence weights, never model vibes (\u00a70.3)."

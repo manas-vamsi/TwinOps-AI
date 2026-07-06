@@ -368,6 +368,8 @@ export interface components {
             recommended_actions: string[];
             /** Estimated Recovery */
             estimated_recovery: string;
+            /** Runbook Id */
+            runbook_id: string | null;
         };
         /** Scenario */
         Scenario: {

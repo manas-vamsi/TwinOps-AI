@@ -1,4 +1,5 @@
-import { CheckCircle2, Lightbulb, Search } from "lucide-react";
+import Link from "next/link";
+import { BookOpen, CheckCircle2, Lightbulb, Search } from "lucide-react";
 import type { RootCause } from "./types";
 
 /** The explainable-AI verdict: root cause + evidence-weighted confidence +
@@ -56,6 +57,17 @@ export function RootCauseCard({ rca }: { rca: RootCause }) {
           ))}
         </ul>
       </div>
+
+      {rca.runbook_id && (
+        <Link
+          href={`/knowledge?doc=${rca.runbook_id}`}
+          className="mt-4 flex items-center gap-2 rounded-xl border border-hairline bg-raised px-3 py-2.5 text-[13px] text-text transition-colors hover:border-accent/40"
+        >
+          <BookOpen className="size-4 text-accent" aria-hidden />
+          Runbook that fixes this
+          <span className="ml-auto text-xs text-accent">Open →</span>
+        </Link>
+      )}
 
       <div className="mt-5 flex items-center justify-between border-t border-hairline pt-3 text-xs text-muted">
         <span>Estimated recovery</span>
