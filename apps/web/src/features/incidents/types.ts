@@ -13,6 +13,22 @@ export interface RootCause {
   estimated_recovery: string;
 }
 
+export interface ReplayFrame {
+  tick: number;
+  health: {
+    id: string;
+    score: number;
+    status: "healthy" | "degraded" | "critical";
+    metrics: { cpu: number; memory: number; latency_p95: number; error_rate: number };
+  }[];
+}
+
+export interface ReplayResponse {
+  incident_id: string;
+  origin: string;
+  frames: ReplayFrame[];
+}
+
 export interface Incident {
   id: string;
   title: string;

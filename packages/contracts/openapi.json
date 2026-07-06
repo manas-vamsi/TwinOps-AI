@@ -254,6 +254,48 @@
         }
       }
     },
+    "/api/v1/incidents/{incident_id}/replay": {
+      "get": {
+        "tags": [
+          "incidents"
+        ],
+        "summary": "Get Replay",
+        "operationId": "get_replay_api_v1_incidents__incident_id__replay_get",
+        "parameters": [
+          {
+            "name": "incident_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Incident Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReplayResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/knowledge/search": {
       "get": {
         "tags": [
@@ -624,6 +666,53 @@
           "configured"
         ],
         "title": "Provider"
+      },
+      "ReplayFrame": {
+        "properties": {
+          "tick": {
+            "type": "integer",
+            "title": "Tick"
+          },
+          "health": {
+            "items": {
+              "$ref": "#/components/schemas/NodeHealth"
+            },
+            "type": "array",
+            "title": "Health"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tick",
+          "health"
+        ],
+        "title": "ReplayFrame"
+      },
+      "ReplayResponse": {
+        "properties": {
+          "incident_id": {
+            "type": "string",
+            "title": "Incident Id"
+          },
+          "origin": {
+            "type": "string",
+            "title": "Origin"
+          },
+          "frames": {
+            "items": {
+              "$ref": "#/components/schemas/ReplayFrame"
+            },
+            "type": "array",
+            "title": "Frames"
+          }
+        },
+        "type": "object",
+        "required": [
+          "incident_id",
+          "origin",
+          "frames"
+        ],
+        "title": "ReplayResponse"
       },
       "RootCause": {
         "properties": {

@@ -38,6 +38,23 @@ def test_incident_opens_then_resolves() -> None:
     assert opened.resolved_tick == 20
 
 
+def test_replay_reconstructs_the_cascade() -> None:
+    from twinops.modules.incidents.replay import build_replay
+
+    svc = IncidentService()
+    svc.evaluate(_health_with_failure("db-orders-pg", age=6), tick=6)
+    inc = svc.incidents[svc.open_id]  # type: ignore[index]
+    replay = build_replay(inc)
+
+    assert replay is not None
+    assert replay.origin == "db-orders-pg"
+    assert len(replay.frames) >= 2
+    # origin degrades across the replay window
+    first = next(h.score for h in replay.frames[0].health if h.id == "db-orders-pg")
+    last = next(h.score for h in replay.frames[-1].health if h.id == "db-orders-pg")
+    assert last < first
+
+
 def test_incidents_endpoint() -> None:
     client = TestClient(create_app())
     res = client.get("/api/v1/incidents")

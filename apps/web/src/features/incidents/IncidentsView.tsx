@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Download, Flame, ShieldCheck } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Download, Flame, PlayCircle, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTwinStore } from "@/stores/twinStore";
-import { fetchIncidents } from "./api";
+import { fetchIncidents, fetchReplay } from "./api";
 import { RootCauseCard } from "./RootCauseCard";
 import { downloadPostmortem } from "./postmortem";
 import { SEVERITY_STYLE, STATUS_LABEL } from "./incidentStyle";
@@ -100,8 +101,20 @@ export function IncidentsView() {
 }
 
 function IncidentWorkspace({ incident }: { incident: Incident }) {
+  const router = useRouter();
+  const startReplay = useTwinStore((s) => s.startReplay);
   const sev = SEVERITY_STYLE[incident.severity];
   const open = incident.status !== "resolved";
+
+  async function replay() {
+    try {
+      const { frames } = await fetchReplay(incident.id);
+      startReplay(frames);
+      router.push("/twin");
+    } catch {
+      // replay unavailable (no root cause yet) — button only shows when present
+    }
+  }
 
   return (
     <div className="mx-auto max-w-3xl space-y-5 p-6">
@@ -128,14 +141,26 @@ function IncidentWorkspace({ incident }: { incident: Incident }) {
             <span className="font-mono text-faint">· {incident.id}</span>
           </div>
         </div>
-        <button
-          type="button"
-          onClick={() => downloadPostmortem(incident)}
-          className="ml-auto flex h-9 items-center gap-2 rounded-xl border border-hairline bg-surface px-3 text-xs text-muted transition-colors hover:text-text"
-        >
-          <Download className="size-3.5" aria-hidden />
-          Export postmortem
-        </button>
+        <div className="ml-auto flex items-center gap-2">
+          {incident.root_cause && (
+            <button
+              type="button"
+              onClick={replay}
+              className="flex h-9 items-center gap-2 rounded-xl border border-hairline bg-surface px-3 text-xs text-muted transition-colors hover:text-text"
+            >
+              <PlayCircle className="size-3.5" aria-hidden />
+              Replay on twin
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => downloadPostmortem(incident)}
+            className="flex h-9 items-center gap-2 rounded-xl border border-hairline bg-surface px-3 text-xs text-muted transition-colors hover:text-text"
+          >
+            <Download className="size-3.5" aria-hidden />
+            Export postmortem
+          </button>
+        </div>
       </div>
 
       {/* root cause */}

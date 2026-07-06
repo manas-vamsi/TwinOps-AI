@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { Incident } from "@/features/incidents/types";
+import type { Incident, ReplayFrame } from "@/features/incidents/types";
 import type {
   DeltaPayload,
   NodeRuntime,
@@ -28,6 +28,8 @@ interface TwinState {
   selectedNodeId: string | null;
   whatIfMode: boolean;
   whatIfNodeId: string | null;
+  replayFrames: ReplayFrame[] | null;
+  replayIndex: number;
   lastSeq: number;
 
   setStatus: (s: ConnStatus) => void;
@@ -36,6 +38,28 @@ interface TwinState {
   select: (nodeId: string | null) => void;
   toggleWhatIf: () => void;
   setWhatIfNode: (nodeId: string | null) => void;
+  startReplay: (frames: ReplayFrame[]) => void;
+  setReplayIndex: (i: number) => void;
+  stopReplay: () => void;
+}
+
+/** Runtime map for a replay frame (no history needed for playback). */
+export function replayRuntime(frame: ReplayFrame): Record<string, NodeRuntime> {
+  const out: Record<string, NodeRuntime> = {};
+  for (const h of frame.health) {
+    out[h.id] = {
+      score: h.score,
+      status: h.status,
+      metrics: {
+        cpu: h.metrics.cpu,
+        memory: h.metrics.memory,
+        latencyP95: h.metrics.latency_p95,
+        errorRate: h.metrics.error_rate,
+      },
+      history: [],
+    };
+  }
+  return out;
 }
 
 function toRuntime(h: WireHealth, prev?: NodeRuntime): NodeRuntime {
@@ -64,6 +88,8 @@ export const useTwinStore = create<TwinState>((set) => ({
   selectedNodeId: null,
   whatIfMode: false,
   whatIfNodeId: null,
+  replayFrames: null,
+  replayIndex: 0,
   lastSeq: 0,
 
   setStatus: (status) => set({ status }),
@@ -105,4 +131,9 @@ export const useTwinStore = create<TwinState>((set) => ({
     })),
 
   setWhatIfNode: (nodeId) => set({ whatIfNodeId: nodeId }),
+
+  startReplay: (frames) =>
+    set({ replayFrames: frames, replayIndex: 0, whatIfMode: false, selectedNodeId: null }),
+  setReplayIndex: (i) => set({ replayIndex: i }),
+  stopReplay: () => set({ replayFrames: null, replayIndex: 0 }),
 }));

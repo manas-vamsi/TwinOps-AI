@@ -11,7 +11,7 @@ import {
   type Node,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useTwinStore } from "@/stores/twinStore";
+import { replayRuntime, useTwinStore } from "@/stores/twinStore";
 import { layoutEdges, layoutNodes } from "./layout";
 import { computeBlastRadius } from "./blastRadius";
 import { TwinNode, type TwinNodeData } from "./TwinNode";
@@ -21,7 +21,9 @@ const nodeTypes = { twin: TwinNode };
 function TwinCanvasInner() {
   const specNodes = useTwinStore((s) => s.nodes);
   const specEdges = useTwinStore((s) => s.edges);
-  const runtime = useTwinStore((s) => s.runtime);
+  const liveRuntime = useTwinStore((s) => s.runtime);
+  const replayFrames = useTwinStore((s) => s.replayFrames);
+  const replayIndex = useTwinStore((s) => s.replayIndex);
   const selectedNodeId = useTwinStore((s) => s.selectedNodeId);
   const select = useTwinStore((s) => s.select);
   const whatIfMode = useTwinStore((s) => s.whatIfMode);
@@ -37,6 +39,12 @@ function TwinCanvasInner() {
   const blast = useMemo(
     () => (whatIfNodeId ? computeBlastRadius(specEdges, whatIfNodeId) : null),
     [whatIfNodeId, specEdges],
+  );
+
+  // during replay the canvas shows the reconstructed frame instead of live health
+  const runtime = useMemo(
+    () => (replayFrames ? replayRuntime(replayFrames[replayIndex]) : liveRuntime),
+    [replayFrames, replayIndex, liveRuntime],
   );
 
   const nodes: Node<TwinNodeData>[] = useMemo(
