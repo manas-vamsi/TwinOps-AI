@@ -17,7 +17,7 @@ export function PagePlaceholder({ item }: { item: NavItem }) {
     <div className="flex min-h-[70vh] items-center justify-center p-8">
       <div className="w-full max-w-xl rounded-2xl border border-dashed border-hairline bg-surface/50 p-10 text-center">
         <div className="mx-auto mb-6 flex size-14 items-center justify-center rounded-2xl border border-hairline bg-raised">
-          <item.icon className="size-6 text-gold" aria-hidden />
+          <item.icon className="size-6 text-accent" aria-hidden />
         </div>
         <h1 className="font-display text-2xl font-semibold tracking-tight">
           {item.label}
@@ -25,8 +25,8 @@ export function PagePlaceholder({ item }: { item: NavItem }) {
         <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-muted">
           {item.description}
         </p>
-        <span className="mt-6 inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-[11px] font-medium text-gold">
-          <span aria-hidden className="size-1 rounded-full bg-gold" />
+        <span className="mt-6 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-[11px] font-medium text-accent">
+          <span aria-hidden className="size-1 rounded-full bg-accent" />
           {PHASE_LABEL[item.phase]}
         </span>
       </div>

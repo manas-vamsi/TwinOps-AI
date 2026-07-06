@@ -14,13 +14,13 @@ export function Sidebar() {
       <div className="flex items-center gap-3 px-5 pt-6 pb-8">
         <div
           aria-hidden
-          className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-gold to-bronze font-display text-lg font-bold text-charcoal"
+          className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-accent to-accent-strong font-display text-lg font-bold text-cream shadow-lg shadow-accent/20"
         >
           T
         </div>
         <div>
           <div className="font-display text-[15px] font-semibold tracking-wide">
-            TwinOps <span className="text-gold">AI</span>
+            TwinOps <span className="text-accent">AI</span>
           </div>
           <div className="text-[10px] uppercase tracking-[0.18em] text-faint">
             Intelligent · Predictive
@@ -48,13 +48,13 @@ export function Sidebar() {
               {active && (
                 <span
                   aria-hidden
-                  className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-gold"
+                  className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-accent"
                 />
               )}
               <item.icon
                 className={cn(
                   "size-[18px] transition-colors",
-                  active ? "text-gold" : "text-faint group-hover:text-muted",
+                  active ? "text-accent" : "text-faint group-hover:text-muted",
                 )}
               />
               {item.label}

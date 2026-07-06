@@ -12,7 +12,7 @@ export function TopBar() {
       <button
         type="button"
         onClick={() => setPaletteOpen(true)}
-        className="flex h-9 w-full max-w-md items-center gap-2 rounded-xl border border-hairline bg-surface px-3 text-sm text-faint transition-colors hover:border-gold/40 hover:text-muted"
+        className="flex h-9 w-full max-w-md items-center gap-2 rounded-xl border border-hairline bg-surface px-3 text-sm text-faint transition-colors hover:border-accent/40 hover:text-muted"
       >
         <Search className="size-4" aria-hidden />
         <span className="flex-1 text-left">
@@ -46,7 +46,7 @@ export function TopBar() {
           <Bell className="size-4" aria-hidden />
           <span
             aria-hidden
-            className="absolute right-2 top-2 size-1.5 rounded-full bg-gold"
+            className="absolute right-2 top-2 size-1.5 rounded-full bg-accent"
           />
         </button>
 
