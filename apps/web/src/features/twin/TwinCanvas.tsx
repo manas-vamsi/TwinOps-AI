@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import {
   Background,
   BackgroundVariant,
@@ -13,32 +13,28 @@ import {
 import "@xyflow/react/dist/style.css";
 import { useTwinStore } from "@/stores/twinStore";
 import { layoutEdges, layoutNodes } from "./layout";
-import { NODES } from "./topology";
 import { TwinNode, type TwinNodeData } from "./TwinNode";
 
 const nodeTypes = { twin: TwinNode };
-const POSITIONS = layoutNodes();
-const RAW_EDGES = layoutEdges();
-const SPEC_BY_ID = new Map(NODES.map((n) => [n.id, n]));
-
-const TICK_MS = 1500;
 
 function TwinCanvasInner() {
+  const specNodes = useTwinStore((s) => s.nodes);
+  const specEdges = useTwinStore((s) => s.edges);
   const runtime = useTwinStore((s) => s.runtime);
   const selectedNodeId = useTwinStore((s) => s.selectedNodeId);
-  const advance = useTwinStore((s) => s.advance);
   const select = useTwinStore((s) => s.select);
 
-  // drive the simulation forward
-  useEffect(() => {
-    const id = setInterval(advance, TICK_MS);
-    return () => clearInterval(id);
-  }, [advance]);
+  const positions = useMemo(() => layoutNodes(specNodes), [specNodes]);
+  const rawEdges = useMemo(() => layoutEdges(specEdges), [specEdges]);
+  const specById = useMemo(
+    () => new Map(specNodes.map((n) => [n.id, n])),
+    [specNodes],
+  );
 
   const nodes: Node<TwinNodeData>[] = useMemo(
     () =>
-      POSITIONS.map((p) => {
-        const spec = SPEC_BY_ID.get(p.id)!;
+      positions.map((p) => {
+        const spec = specById.get(p.id)!;
         const rt = runtime[p.id];
         return {
           id: p.id,
@@ -54,12 +50,12 @@ function TwinCanvasInner() {
           },
         };
       }),
-    [runtime, selectedNodeId],
+    [positions, specById, runtime, selectedNodeId],
   );
 
   const edges: Edge[] = useMemo(
     () =>
-      RAW_EDGES.map((e) => {
+      rawEdges.map((e) => {
         const s = runtime[e.source]?.status;
         const t = runtime[e.target]?.status;
         const hot = [s, t].some((x) => x === "critical" || x === "degraded");
@@ -77,7 +73,7 @@ function TwinCanvasInner() {
           },
         };
       }),
-    [runtime],
+    [rawEdges, runtime],
   );
 
   return (

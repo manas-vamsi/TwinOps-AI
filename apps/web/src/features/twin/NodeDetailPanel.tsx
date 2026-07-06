@@ -3,12 +3,9 @@
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTwinStore } from "@/stores/twinStore";
-import { EDGES, NODES } from "./topology";
 import { KIND_ICON, KIND_LABEL, STATUS_LABEL, STATUS_STYLE } from "./nodeConfig";
 import { Sparkline } from "./Sparkline";
 import type { Metrics } from "./types";
-
-const SPEC_BY_ID = new Map(NODES.map((n) => [n.id, n]));
 
 function Metric({ label, value, unit }: { label: string; value: number; unit: string }) {
   return (
@@ -25,10 +22,12 @@ function Metric({ label, value, unit }: { label: string; value: number; unit: st
 export function NodeDetailPanel() {
   const selectedNodeId = useTwinStore((s) => s.selectedNodeId);
   const runtime = useTwinStore((s) => s.runtime);
+  const nodes = useTwinStore((s) => s.nodes);
+  const edges = useTwinStore((s) => s.edges);
   const select = useTwinStore((s) => s.select);
 
   if (!selectedNodeId) return null;
-  const spec = SPEC_BY_ID.get(selectedNodeId);
+  const spec = nodes.find((n) => n.id === selectedNodeId);
   const rt = runtime[selectedNodeId];
   if (!spec || !rt) return null;
 
@@ -36,8 +35,9 @@ export function NodeDetailPanel() {
   const style = STATUS_STYLE[rt.status];
   const m: Metrics = rt.metrics;
 
-  const dependencies = EDGES.filter((e) => e.source === spec.id).map((e) => e.target);
-  const dependents = EDGES.filter((e) => e.target === spec.id).map((e) => e.source);
+  const labelOf = (id: string) => nodes.find((n) => n.id === id)?.label ?? id;
+  const dependencies = edges.filter((e) => e.source === spec.id).map((e) => e.target);
+  const dependents = edges.filter((e) => e.target === spec.id).map((e) => e.source);
 
   return (
     <aside className="absolute inset-y-0 right-0 z-20 flex w-[360px] flex-col border-l border-hairline bg-chrome shadow-2xl shadow-black/20">
@@ -106,8 +106,8 @@ export function NodeDetailPanel() {
         </div>
 
         {/* relationships */}
-        <Relationship title="Depends on" ids={dependencies} onSelect={select} />
-        <Relationship title="Dependents" ids={dependents} onSelect={select} />
+        <Relationship title="Depends on" ids={dependencies} onSelect={select} labelOf={labelOf} />
+        <Relationship title="Dependents" ids={dependents} onSelect={select} labelOf={labelOf} />
 
         {/* AI reasoning — designed placeholder for Phase 2 */}
         <div className="rounded-xl border border-dashed border-hairline bg-surface/60 p-3">
@@ -127,10 +127,12 @@ function Relationship({
   title,
   ids,
   onSelect,
+  labelOf,
 }: {
   title: string;
   ids: string[];
   onSelect: (id: string) => void;
+  labelOf: (id: string) => string;
 }) {
   return (
     <div>
@@ -151,7 +153,7 @@ function Relationship({
               onClick={() => onSelect(id)}
               className="rounded-lg border border-hairline bg-raised px-2 py-1 font-mono text-[11px] text-muted transition-colors hover:border-accent/40 hover:text-text"
             >
-              {SPEC_BY_ID.get(id)?.label ?? id}
+              {labelOf(id)}
             </button>
           ))}
         </div>

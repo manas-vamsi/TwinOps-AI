@@ -1,23 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronDown, RotateCcw, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTwinStore } from "@/stores/twinStore";
-import { SCENARIOS } from "./topology";
+import { fetchScenarios, injectScenario, resetSimulation } from "./api";
+import type { Scenario } from "./types";
 
-/** Floating control surface over the canvas: inject a failure scenario
- *  (the demo moment), reset, and a health legend. */
+/** Floating control surface: inject a failure scenario (the demo moment)
+ *  and reset. Scenarios + inject/reset go through the server API. */
 export function TwinToolbar() {
   const [open, setOpen] = useState(false);
-  const inject = useTwinStore((s) => s.inject);
-  const reset = useTwinStore((s) => s.reset);
+  const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const activeScenarioId = useTwinStore((s) => s.activeScenarioId);
-  const active = SCENARIOS.find((s) => s.id === activeScenarioId) ?? null;
+  const active = scenarios.find((s) => s.id === activeScenarioId) ?? null;
+
+  useEffect(() => {
+    fetchScenarios()
+      .then(setScenarios)
+      .catch(() => setScenarios([]));
+  }, []);
 
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-3 p-4">
-      {/* left: title + live status */}
       <div className="pointer-events-auto">
         <h1 className="font-display text-lg font-semibold tracking-tight text-text">
           Digital Twin
@@ -31,14 +36,14 @@ export function TwinToolbar() {
         </p>
       </div>
 
-      {/* right: inject + reset */}
       <div className="pointer-events-auto flex items-center gap-2">
         <div className="relative">
           <button
             type="button"
             onClick={() => setOpen((o) => !o)}
             aria-expanded={open}
-            className="flex h-9 items-center gap-2 rounded-xl bg-accent px-3 text-sm font-medium text-cream transition-colors hover:bg-accent-strong"
+            disabled={scenarios.length === 0}
+            className="flex h-9 items-center gap-2 rounded-xl bg-accent px-3 text-sm font-medium text-cream transition-colors hover:bg-accent-strong disabled:opacity-40"
           >
             <Zap className="size-4" aria-hidden />
             Inject failure
@@ -46,12 +51,12 @@ export function TwinToolbar() {
           </button>
           {open && (
             <div className="absolute right-0 top-11 w-64 overflow-hidden rounded-xl border border-hairline bg-surface p-1 shadow-2xl shadow-black/20">
-              {SCENARIOS.map((s) => (
+              {scenarios.map((s) => (
                 <button
                   key={s.id}
                   type="button"
                   onClick={() => {
-                    inject(s.id);
+                    void injectScenario(s.id);
                     setOpen(false);
                   }}
                   className={cn(
@@ -69,7 +74,7 @@ export function TwinToolbar() {
 
         <button
           type="button"
-          onClick={reset}
+          onClick={() => void resetSimulation()}
           disabled={!activeScenarioId}
           className="flex size-9 items-center justify-center rounded-xl border border-hairline bg-surface text-muted transition-colors hover:text-text disabled:opacity-40"
           aria-label="Reset simulation"

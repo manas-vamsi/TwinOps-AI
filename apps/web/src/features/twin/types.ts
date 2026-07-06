@@ -58,3 +58,30 @@ export function scoreToStatus(score: number): HealthStatus {
   if (score >= 40) return "degraded";
   return "critical";
 }
+
+/** Wire types — what the server sends (snake_case, matches Pydantic schemas). */
+export interface WireMetrics {
+  cpu: number;
+  memory: number;
+  latency_p95: number;
+  error_rate: number;
+}
+export interface WireHealth {
+  id: string;
+  score: number;
+  status: HealthStatus;
+  metrics: WireMetrics;
+}
+export interface SnapshotPayload {
+  topology_hash: string;
+  tick: number;
+  active_scenario_id: string | null;
+  nodes: TwinNodeSpec[];
+  edges: TwinEdgeSpec[];
+  health: WireHealth[];
+}
+export interface DeltaPayload {
+  tick: number;
+  active_scenario_id: string | null;
+  health: WireHealth[];
+}
