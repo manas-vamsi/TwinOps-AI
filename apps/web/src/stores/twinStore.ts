@@ -26,12 +26,16 @@ interface TwinState {
   incidents: Incident[]; // open incidents, streamed live
   activeScenarioId: string | null;
   selectedNodeId: string | null;
+  whatIfMode: boolean;
+  whatIfNodeId: string | null;
   lastSeq: number;
 
   setStatus: (s: ConnStatus) => void;
   applySnapshot: (p: SnapshotPayload, seq: number) => void;
   applyDelta: (p: DeltaPayload, seq: number) => void;
   select: (nodeId: string | null) => void;
+  toggleWhatIf: () => void;
+  setWhatIfNode: (nodeId: string | null) => void;
 }
 
 function toRuntime(h: WireHealth, prev?: NodeRuntime): NodeRuntime {
@@ -58,6 +62,8 @@ export const useTwinStore = create<TwinState>((set) => ({
   incidents: [],
   activeScenarioId: null,
   selectedNodeId: null,
+  whatIfMode: false,
+  whatIfNodeId: null,
   lastSeq: 0,
 
   setStatus: (status) => set({ status }),
@@ -90,4 +96,13 @@ export const useTwinStore = create<TwinState>((set) => ({
     }),
 
   select: (nodeId) => set({ selectedNodeId: nodeId }),
+
+  toggleWhatIf: () =>
+    set((s) => ({
+      whatIfMode: !s.whatIfMode,
+      whatIfNodeId: null,
+      selectedNodeId: null,
+    })),
+
+  setWhatIfNode: (nodeId) => set({ whatIfNodeId: nodeId }),
 }));

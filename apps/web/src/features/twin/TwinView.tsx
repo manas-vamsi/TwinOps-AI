@@ -6,6 +6,7 @@ import { TwinCanvas } from "./TwinCanvas";
 import { TwinToolbar } from "./TwinToolbar";
 import { NodeDetailPanel } from "./NodeDetailPanel";
 import { HealthLegend } from "./HealthLegend";
+import { WhatIfBanner } from "./WhatIfBanner";
 
 /** Flagship surface: live dependency graph streamed from the server.
  *  The WebSocket is owned app-wide by RealtimeProvider (shell layout). */
@@ -52,6 +53,7 @@ export function TwinView() {
       <TwinCanvas />
       <TwinToolbar />
       <HealthLegend />
+      <WhatIfBanner />
       <NodeDetailPanel />
       {status === "error" && (
         <div className="pointer-events-none absolute bottom-4 right-4 z-10 flex items-center gap-1.5 rounded-xl border border-warn/40 bg-chrome/80 px-3 py-2 text-[11px] text-warn backdrop-blur">

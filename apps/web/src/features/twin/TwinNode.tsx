@@ -12,6 +12,10 @@ export interface TwinNodeData {
   status: HealthStatus;
   latencyP95: number;
   selected: boolean;
+  /** what-if preview: this node is the hypothetical origin */
+  whatIfOrigin?: boolean;
+  /** what-if preview: this node would be hit by the origin's failure */
+  projected?: boolean;
   [key: string]: unknown;
 }
 
@@ -29,6 +33,8 @@ function TwinNodeInner({ data }: NodeProps) {
         style.ring,
         d.selected && "ring-2 ring-accent ring-offset-2 ring-offset-bg",
         d.status === "critical" && "animate-pulse",
+        d.whatIfOrigin && "border-accent ring-2 ring-accent",
+        d.projected && "border-dashed border-warn/70 [border-style:dashed] opacity-90",
       )}
     >
       <Handle type="target" position={Position.Left} className="!size-1.5 !border-0 !bg-hairline" />

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChevronDown, RotateCcw, Zap } from "lucide-react";
+import { ChevronDown, FlaskConical, RotateCcw, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTwinStore } from "@/stores/twinStore";
 import { fetchScenarios, injectScenario, resetSimulation } from "./api";
@@ -14,6 +14,8 @@ export function TwinToolbar() {
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const activeScenarioId = useTwinStore((s) => s.activeScenarioId);
   const active = scenarios.find((s) => s.id === activeScenarioId) ?? null;
+  const whatIfMode = useTwinStore((s) => s.whatIfMode);
+  const toggleWhatIf = useTwinStore((s) => s.toggleWhatIf);
 
   useEffect(() => {
     fetchScenarios()
@@ -28,7 +30,9 @@ export function TwinToolbar() {
           Digital Twin
         </h1>
         <p className="mt-0.5 text-xs text-muted">
-          {active ? (
+          {whatIfMode ? (
+            <span className="text-accent">● What-if mode — click a node to preview its blast radius</span>
+          ) : active ? (
             <span className="text-critical">● {active.blurb}</span>
           ) : (
             <span className="text-success">● All systems nominal</span>
@@ -37,6 +41,21 @@ export function TwinToolbar() {
       </div>
 
       <div className="pointer-events-auto flex items-center gap-2">
+        <button
+          type="button"
+          onClick={toggleWhatIf}
+          aria-pressed={whatIfMode}
+          className={cn(
+            "flex h-9 items-center gap-2 rounded-xl border px-3 text-sm font-medium transition-colors",
+            whatIfMode
+              ? "border-accent bg-accent-soft text-accent"
+              : "border-hairline bg-surface text-muted hover:text-text",
+          )}
+        >
+          <FlaskConical className="size-4" aria-hidden />
+          What-if
+        </button>
+
         <div className="relative">
           <button
             type="button"

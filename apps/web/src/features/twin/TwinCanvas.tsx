@@ -13,6 +13,7 @@ import {
 import "@xyflow/react/dist/style.css";
 import { useTwinStore } from "@/stores/twinStore";
 import { layoutEdges, layoutNodes } from "./layout";
+import { computeBlastRadius } from "./blastRadius";
 import { TwinNode, type TwinNodeData } from "./TwinNode";
 
 const nodeTypes = { twin: TwinNode };
@@ -23,12 +24,19 @@ function TwinCanvasInner() {
   const runtime = useTwinStore((s) => s.runtime);
   const selectedNodeId = useTwinStore((s) => s.selectedNodeId);
   const select = useTwinStore((s) => s.select);
+  const whatIfMode = useTwinStore((s) => s.whatIfMode);
+  const whatIfNodeId = useTwinStore((s) => s.whatIfNodeId);
+  const setWhatIfNode = useTwinStore((s) => s.setWhatIfNode);
 
   const positions = useMemo(() => layoutNodes(specNodes), [specNodes]);
   const rawEdges = useMemo(() => layoutEdges(specEdges), [specEdges]);
   const specById = useMemo(
     () => new Map(specNodes.map((n) => [n.id, n])),
     [specNodes],
+  );
+  const blast = useMemo(
+    () => (whatIfNodeId ? computeBlastRadius(specEdges, whatIfNodeId) : null),
+    [whatIfNodeId, specEdges],
   );
 
   const nodes: Node<TwinNodeData>[] = useMemo(
@@ -47,10 +55,12 @@ function TwinCanvasInner() {
             status: rt?.status ?? "healthy",
             latencyP95: rt?.metrics.latencyP95 ?? 0,
             selected: selectedNodeId === p.id,
+            whatIfOrigin: whatIfNodeId === p.id,
+            projected: blast?.has(p.id) ?? false,
           },
         };
       }),
-    [positions, specById, runtime, selectedNodeId],
+    [positions, specById, runtime, selectedNodeId, whatIfNodeId, blast],
   );
 
   const edges: Edge[] = useMemo(
@@ -81,8 +91,8 @@ function TwinCanvasInner() {
       nodes={nodes}
       edges={edges}
       nodeTypes={nodeTypes}
-      onNodeClick={(_, node) => select(node.id)}
-      onPaneClick={() => select(null)}
+      onNodeClick={(_, node) => (whatIfMode ? setWhatIfNode(node.id) : select(node.id))}
+      onPaneClick={() => (whatIfMode ? setWhatIfNode(null) : select(null))}
       fitView
       fitViewOptions={{ padding: 0.15 }}
       minZoom={0.3}
