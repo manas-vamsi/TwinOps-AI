@@ -1,3 +1,7 @@
+import asyncio
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
+
 import structlog
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,8 +12,19 @@ from twinops.core.health import router as health_router
 from twinops.core.logging import configure_logging
 from twinops.core.request_id import request_id_middleware
 from twinops.modules.twin.router import router as twin_router
+from twinops.realtime.ticker import run_ticker
+from twinops.realtime.ws import router as ws_router
 
 log = structlog.get_logger()
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI) -> AsyncGenerator[None]:
+    ticker = asyncio.create_task(run_ticker())
+    try:
+        yield
+    finally:
+        ticker.cancel()
 
 
 def create_app() -> FastAPI:
@@ -20,6 +35,7 @@ def create_app() -> FastAPI:
         title=settings.app_name,
         version=__version__,
         docs_url="/docs" if settings.debug else None,
+        lifespan=lifespan,
     )
 
     app.add_middleware(
@@ -33,6 +49,7 @@ def create_app() -> FastAPI:
 
     app.include_router(health_router)
     app.include_router(twin_router)
+    app.include_router(ws_router)
 
     log.info("app_created", env=settings.env, version=__version__)
     return app
