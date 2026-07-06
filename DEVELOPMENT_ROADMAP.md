@@ -4,6 +4,8 @@ Six phases. Every phase ends with a **demoable exit criterion** (a sentence you 
 
 **Strategy: shareable at every phase boundary.** After P2, a "P5-lite" pass (README GIF, 2-minute video, deployed demo) makes the project presentable *early* — later phases improve what's already shareable, so there is never a moment where the repo is half-built with nothing to show.
 
+**Progress (2026-07-06):** P0 ✅ · Fujitsu rebrand + light/dark theme ✅ · P1 ✅ (twin + backend sim + WebSocket streaming) · P2 ✅ (incident detection + deterministic root-cause + workspace; LLM narration deferred) · P3 🟡 (Knowledge Hub with keyword search; semantic RAG pending) · P4 🟡 (dashboard, agents view, analytics, infrastructure done; notifications, copilot, replay, what-if pending) · P5 🟡 (settings + /config done; auth, deploy, demo script pending). **All 8 nav surfaces render real, live data.**
+
 | Phase | Weeks | Builds | Exit criterion |
 |-------|-------|--------|----------------|
 | **P0 · Foundation** | 1 | Monorepo (pnpm workspaces), design tokens from the brand system, app shell (sidebar · top bar · command palette), FastAPI skeleton + `/healthz`, docker-compose (postgres + valkey + ollama), CI (lint · typecheck · test · build · contract-gen) | `docker compose up` + `pnpm dev` = branded shell running locally; CI green; optional Vercel Hobby preview |

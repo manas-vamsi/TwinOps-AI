@@ -6,7 +6,7 @@
 
 *A real-time Digital Twin of enterprise infrastructure with explainable, multi-agent AI operations — detection, root-cause analysis, prediction, and remediation guidance with evidence you can audit.*
 
-`Status: 🚧 In development — Phase 0 complete, Phase 1 (Twin + Simulation) next` · [Roadmap](DEVELOPMENT_ROADMAP.md)
+`Status: 🚧 Active — all 8 surfaces live · Twin + Incidents + RCA working end-to-end` · [Roadmap](DEVELOPMENT_ROADMAP.md)
 
 </div>
 
