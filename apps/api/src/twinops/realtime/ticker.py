@@ -5,6 +5,7 @@ import asyncio
 
 import structlog
 
+from twinops.modules.incidents.service import incident_service
 from twinops.modules.twin.service import twin_service
 from twinops.realtime.manager import manager
 
@@ -18,6 +19,7 @@ async def run_ticker() -> None:
     while True:
         await asyncio.sleep(TICK_SECONDS)
         twin_service.advance()
+        incident_service.evaluate(twin_service.health, twin_service.tick)
         await manager.broadcast(
             {
                 "topic": "twin.health",
@@ -26,6 +28,7 @@ async def run_ticker() -> None:
                     "tick": twin_service.tick,
                     "active_scenario_id": twin_service.active_scenario_id,
                     "health": [h.model_dump() for h in twin_service.health.values()],
+                    "incidents": [i.model_dump() for i in incident_service.open_incidents()],
                 },
             }
         )

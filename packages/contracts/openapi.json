@@ -164,6 +164,73 @@
           }
         }
       }
+    },
+    "/api/v1/incidents": {
+      "get": {
+        "tags": [
+          "incidents"
+        ],
+        "summary": "List Incidents",
+        "operationId": "list_incidents_api_v1_incidents_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Incident"
+                  },
+                  "type": "array",
+                  "title": "Response List Incidents Api V1 Incidents Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/incidents/{incident_id}": {
+      "get": {
+        "tags": [
+          "incidents"
+        ],
+        "summary": "Get Incident",
+        "operationId": "get_incident_api_v1_incidents__incident_id__get",
+        "parameters": [
+          {
+            "name": "incident_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Incident Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Incident"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -236,6 +303,81 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
+      "Incident": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "detected",
+              "investigating",
+              "identified",
+              "resolved"
+            ],
+            "title": "Status"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ],
+            "title": "Severity"
+          },
+          "started_tick": {
+            "type": "integer",
+            "title": "Started Tick"
+          },
+          "resolved_tick": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved Tick"
+          },
+          "affected_node_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Affected Node Ids"
+          },
+          "root_cause": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RootCause"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "status",
+          "severity",
+          "started_tick",
+          "resolved_tick",
+          "affected_node_ids",
+          "root_cause"
+        ],
+        "title": "Incident"
+      },
       "Metrics": {
         "properties": {
           "cpu": {
@@ -295,6 +437,56 @@
           "metrics"
         ],
         "title": "NodeHealth"
+      },
+      "RootCause": {
+        "properties": {
+          "node_id": {
+            "type": "string",
+            "title": "Node Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "confidence": {
+            "type": "integer",
+            "title": "Confidence"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          },
+          "evidence": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Evidence"
+          },
+          "recommended_actions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Recommended Actions"
+          },
+          "estimated_recovery": {
+            "type": "string",
+            "title": "Estimated Recovery"
+          }
+        },
+        "type": "object",
+        "required": [
+          "node_id",
+          "label",
+          "confidence",
+          "summary",
+          "evidence",
+          "recommended_actions",
+          "estimated_recovery"
+        ],
+        "title": "RootCause",
+        "description": "Deterministic root-cause verdict inferred from topology + health.\nConfidence is computed from evidence weights, never model vibes (\u00a70.3)."
       },
       "Scenario": {
         "properties": {

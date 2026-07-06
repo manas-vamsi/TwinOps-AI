@@ -115,6 +115,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/incidents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Incidents */
+        get: operations["list_incidents_api_v1_incidents_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/incidents/{incident_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Incident */
+        get: operations["get_incident_api_v1_incidents__incident_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -142,6 +176,30 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /** Incident */
+        Incident: {
+            /** Id */
+            id: string;
+            /** Title */
+            title: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "detected" | "investigating" | "identified" | "resolved";
+            /**
+             * Severity
+             * @enum {string}
+             */
+            severity: "low" | "medium" | "high";
+            /** Started Tick */
+            started_tick: number;
+            /** Resolved Tick */
+            resolved_tick: number | null;
+            /** Affected Node Ids */
+            affected_node_ids: string[];
+            root_cause: components["schemas"]["RootCause"] | null;
+        };
         /** Metrics */
         Metrics: {
             /** Cpu */
@@ -165,6 +223,27 @@ export interface components {
              */
             status: "healthy" | "degraded" | "critical";
             metrics: components["schemas"]["Metrics"];
+        };
+        /**
+         * RootCause
+         * @description Deterministic root-cause verdict inferred from topology + health.
+         *     Confidence is computed from evidence weights, never model vibes (§0.3).
+         */
+        RootCause: {
+            /** Node Id */
+            node_id: string;
+            /** Label */
+            label: string;
+            /** Confidence */
+            confidence: number;
+            /** Summary */
+            summary: string;
+            /** Evidence */
+            evidence: string[];
+            /** Recommended Actions */
+            recommended_actions: string[];
+            /** Estimated Recovery */
+            estimated_recovery: string;
         };
         /** Scenario */
         Scenario: {
@@ -351,6 +430,57 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["GraphSnapshot"];
+                };
+            };
+        };
+    };
+    list_incidents_api_v1_incidents_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Incident"][];
+                };
+            };
+        };
+    };
+    get_incident_api_v1_incidents__incident_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                incident_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Incident"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

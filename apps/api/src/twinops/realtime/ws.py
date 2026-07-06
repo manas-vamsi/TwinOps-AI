@@ -1,5 +1,6 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
+from twinops.modules.incidents.service import incident_service
 from twinops.modules.twin.service import twin_service
 from twinops.realtime.manager import manager
 
@@ -15,7 +16,10 @@ async def ws(websocket: WebSocket) -> None:
             "topic": "twin.health",
             "seq": manager.seq,
             "type": "snapshot",
-            "payload": twin_service.snapshot().model_dump(),
+            "payload": {
+                **twin_service.snapshot().model_dump(),
+                "incidents": [i.model_dump() for i in incident_service.open_incidents()],
+            },
         }
     )
     try:

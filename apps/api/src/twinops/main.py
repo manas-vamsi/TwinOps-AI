@@ -11,6 +11,7 @@ from twinops.core.config import get_settings
 from twinops.core.health import router as health_router
 from twinops.core.logging import configure_logging
 from twinops.core.request_id import request_id_middleware
+from twinops.modules.incidents.router import router as incidents_router
 from twinops.modules.twin.router import router as twin_router
 from twinops.realtime.ticker import run_ticker
 from twinops.realtime.ws import router as ws_router
@@ -49,6 +50,7 @@ def create_app() -> FastAPI:
 
     app.include_router(health_router)
     app.include_router(twin_router)
+    app.include_router(incidents_router)
     app.include_router(ws_router)
 
     log.info("app_created", env=settings.env, version=__version__)
