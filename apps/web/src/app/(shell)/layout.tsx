@@ -2,6 +2,7 @@ import { Sidebar } from "@/components/shell/Sidebar";
 import { TopBar } from "@/components/shell/TopBar";
 import { CommandPalette } from "@/components/shell/CommandPalette";
 import { RealtimeProvider } from "@/components/shell/RealtimeProvider";
+import { NotificationsWatcher } from "@/components/shell/NotificationsWatcher";
 
 export default function ShellLayout({
   children,
@@ -15,6 +16,7 @@ export default function ShellLayout({
       </div>
       <CommandPalette />
       <RealtimeProvider />
+      <NotificationsWatcher />
     </div>
   );
 }

@@ -1,8 +1,9 @@
 "use client";
 
-import { Bell, ChevronDown, Search } from "lucide-react";
+import { ChevronDown, Search } from "lucide-react";
 import { useUiStore } from "@/stores/uiStore";
 import { ThemeToggle } from "./ThemeToggle";
+import { NotificationsBell } from "./NotificationsBell";
 
 export function TopBar() {
   const setPaletteOpen = useUiStore((s) => s.setPaletteOpen);
@@ -42,17 +43,7 @@ export function TopBar() {
         <ThemeToggle />
 
         {/* notifications */}
-        <button
-          type="button"
-          aria-label="Notifications"
-          className="relative flex size-9 items-center justify-center rounded-xl border border-hairline bg-surface text-muted transition-colors hover:text-text"
-        >
-          <Bell className="size-4" aria-hidden />
-          <span
-            aria-hidden
-            className="absolute right-2 top-2 size-1.5 rounded-full bg-accent"
-          />
-        </button>
+        <NotificationsBell />
 
         {/* profile */}
         <div
