@@ -23,7 +23,11 @@ Monitoring tools answer *"what happened?"*. TwinOps AI answers **why it happened
 
 ## The demo moment
 
+![TwinOps AI — inject a failure, watch it cascade to root cause](docs/assets/demo.gif)
+
 > Open the twin → inject a database connection-pool failure → watch the cascade ripple across the graph in amber and crimson → agents investigate live in a visible event stream → the AI names the root cause with 90%+ evidence-backed confidence and cites the runbook that fixes it → apply the action → watch recovery to emerald.
+
+*Recording the GIF/video: see [docs/demo/DEMO_SCRIPT.md](docs/demo/DEMO_SCRIPT.md) — deterministic, ~10 min to capture.*
 
 ## Architecture at a glance
 
