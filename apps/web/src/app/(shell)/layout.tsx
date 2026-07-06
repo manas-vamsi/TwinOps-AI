@@ -3,6 +3,7 @@ import { TopBar } from "@/components/shell/TopBar";
 import { CommandPalette } from "@/components/shell/CommandPalette";
 import { RealtimeProvider } from "@/components/shell/RealtimeProvider";
 import { NotificationsWatcher } from "@/components/shell/NotificationsWatcher";
+import { Copilot } from "@/features/copilot/Copilot";
 
 export default function ShellLayout({
   children,
@@ -17,6 +18,7 @@ export default function ShellLayout({
       <CommandPalette />
       <RealtimeProvider />
       <NotificationsWatcher />
+      <Copilot />
     </div>
   );
 }
