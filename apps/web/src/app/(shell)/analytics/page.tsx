@@ -1,11 +1,8 @@
 import type { Metadata } from "next";
-import { NAV_ITEMS } from "@/components/shell/navigation";
-import { PagePlaceholder } from "@/components/ui/PagePlaceholder";
+import { AnalyticsView } from "@/features/analytics/AnalyticsView";
 
 export const metadata: Metadata = { title: "Analytics" };
 
-const item = NAV_ITEMS.find((i) => i.href === "/analytics")!;
-
 export default function AnalyticsPage() {
-  return <PagePlaceholder item={item} />;
+  return <AnalyticsView />;
 }
