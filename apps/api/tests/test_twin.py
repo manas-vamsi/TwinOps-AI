@@ -40,3 +40,13 @@ def test_graph_endpoint_returns_full_topology() -> None:
 def test_inject_unknown_scenario_is_404() -> None:
     client = TestClient(create_app())
     assert client.post("/api/v1/simulation/inject/nope").status_code == 404
+
+
+def test_scenarios_cover_eight_distinct_origins() -> None:
+    client = TestClient(create_app())
+    scenarios = client.get("/api/v1/simulation/scenarios").json()
+    assert len(scenarios) == 8
+    origins = {s["origin"] for s in scenarios}
+    assert len(origins) == 8  # each hits a different node
+    node_ids = {n.id for n in NODES}
+    assert origins <= node_ids  # every origin is a real node

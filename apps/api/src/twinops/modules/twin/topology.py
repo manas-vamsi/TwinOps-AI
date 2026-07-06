@@ -78,6 +78,30 @@ SCENARIOS: list[Scenario] = [
         origin="q-order-events",
         blurb="Order events queue backing up",
     ),
+    Scenario(
+        id="gateway-cert-expiry",
+        label="Gateway TLS cert expiry",
+        origin="gw-public",
+        blurb="Public API Gateway certificate expired",
+    ),
+    Scenario(
+        id="orders-memory-leak",
+        label="Memory leak → OOM",
+        origin="svc-orders",
+        blurb="Orders Service memory climbing toward OOM",
+    ),
+    Scenario(
+        id="checkout-deploy-regression",
+        label="Deploy latency regression",
+        origin="svc-checkout",
+        blurb="Checkout latency regressed after a deploy",
+    ),
+    Scenario(
+        id="catalog-disk-fill",
+        label="Database disk fill",
+        origin="db-catalog-pg",
+        blurb="Catalog Postgres disk nearly full",
+    ),
 ]
 
 # dependents: who-depends-on-me (reverse edges) — used by the cascade BFS
