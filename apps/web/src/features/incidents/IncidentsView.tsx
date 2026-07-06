@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Flame, ShieldCheck } from "lucide-react";
+import { Download, Flame, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTwinStore } from "@/stores/twinStore";
 import { fetchIncidents } from "./api";
 import { RootCauseCard } from "./RootCauseCard";
+import { downloadPostmortem } from "./postmortem";
 import { SEVERITY_STYLE, STATUS_LABEL } from "./incidentStyle";
 import type { Incident } from "./types";
 
@@ -127,6 +128,14 @@ function IncidentWorkspace({ incident }: { incident: Incident }) {
             <span className="font-mono text-faint">· {incident.id}</span>
           </div>
         </div>
+        <button
+          type="button"
+          onClick={() => downloadPostmortem(incident)}
+          className="ml-auto flex h-9 items-center gap-2 rounded-xl border border-hairline bg-surface px-3 text-xs text-muted transition-colors hover:text-text"
+        >
+          <Download className="size-3.5" aria-hidden />
+          Export postmortem
+        </button>
       </div>
 
       {/* root cause */}
