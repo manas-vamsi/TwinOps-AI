@@ -9,7 +9,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="flex h-full w-64 shrink-0 flex-col border-r border-hairline bg-charcoal">
+    <aside className="flex h-full w-64 shrink-0 flex-col border-r border-hairline bg-chrome">
       {/* brand */}
       <div className="flex items-center gap-3 px-5 pt-6 pb-8">
         <div
@@ -41,8 +41,8 @@ export function Sidebar() {
               className={cn(
                 "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors",
                 active
-                  ? "bg-raised text-text"
-                  : "text-muted hover:bg-surface hover:text-text",
+                  ? "bg-accent-soft text-text"
+                  : "text-muted hover:bg-raised hover:text-text",
               )}
             >
               {active && (

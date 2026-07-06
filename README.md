@@ -64,7 +64,7 @@ Prereqs: Node 22+, pnpm, [uv](https://docs.astral.sh/uv/), Docker.
 
 ## Design language
 
-Pure black + charcoal surfaces, luxury gold accents, emerald for healthy, crimson for critical. Manrope + Space Grotesk. Inspired by Linear, Vercel, and Stripe — not Grafana. The interface should feel like an operating system for infrastructure, and everything should feel expensive.
+Fujitsu-aligned: **Fujitsu Red `#E60012`** accent, light theme by default (mirroring Fujitsu's own white-and-red web presence) with a premium dark theme one click away. Emerald for healthy, signal-red for critical. Manrope + Space Grotesk + JetBrains Mono. Inspired by Linear, Vercel, and Stripe, not Grafana. The interface should feel like an operating system for infrastructure, and everything should feel expensive.
 
 ---
 

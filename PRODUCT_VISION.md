@@ -53,7 +53,7 @@ Premium, calm, intelligent, minimal, trustworthy. The interface should feel like
 | Token | Value |
 |---|---|
 | Background | Pure black / charcoal `#0B0F14`, slate `#11161D` |
-| Accent | Luxury gold `#D4AF37` |
+| Accent | Fujitsu Red `#E60012` (both themes) |
 | Success | Emerald `#10B981` · teal `#14D8C4` |
 | Warning / Critical | Amber / deep crimson |
 | Text | Cream `#F6F4EB` |

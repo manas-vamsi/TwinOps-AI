@@ -2,13 +2,14 @@
 
 import { Bell, ChevronDown, Search } from "lucide-react";
 import { useUiStore } from "@/stores/uiStore";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function TopBar() {
   const setPaletteOpen = useUiStore((s) => s.setPaletteOpen);
 
   return (
-    <header className="flex h-14 shrink-0 items-center gap-3 border-b border-hairline bg-charcoal/80 px-4 backdrop-blur">
-      {/* global search — opens the command palette */}
+    <header className="flex h-14 shrink-0 items-center gap-3 border-b border-hairline bg-chrome/80 px-4 backdrop-blur">
+      {/* search field: opens the command palette */}
       <button
         type="button"
         onClick={() => setPaletteOpen(true)}
@@ -37,6 +38,9 @@ export function TopBar() {
           <ChevronDown className="size-3.5 text-faint" aria-hidden />
         </button>
 
+        {/* theme toggle */}
+        <ThemeToggle />
+
         {/* notifications */}
         <button
           type="button"
@@ -53,7 +57,7 @@ export function TopBar() {
         {/* profile */}
         <div
           aria-label="Signed in as Manas"
-          className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-forest to-surface font-display text-xs font-semibold text-sage"
+          className="flex size-9 items-center justify-center rounded-xl bg-accent-soft font-display text-xs font-semibold text-accent"
         >
           M
         </div>
