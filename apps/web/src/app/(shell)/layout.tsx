@@ -4,6 +4,7 @@ import { CommandPalette } from "@/components/shell/CommandPalette";
 import { RealtimeProvider } from "@/components/shell/RealtimeProvider";
 import { NotificationsWatcher } from "@/components/shell/NotificationsWatcher";
 import { Copilot } from "@/features/copilot/Copilot";
+import { AuthGate } from "@/components/shell/AuthGate";
 
 export default function ShellLayout({
   children,
@@ -19,6 +20,7 @@ export default function ShellLayout({
       <RealtimeProvider />
       <NotificationsWatcher />
       <Copilot />
+      <AuthGate />
     </div>
   );
 }

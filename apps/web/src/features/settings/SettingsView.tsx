@@ -24,7 +24,7 @@ export function SettingsView() {
   const [config, setConfig] = useState<SystemConfig | null>(null);
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/v1/config`)
+    fetch(`${API_BASE}/api/v1/config`, { credentials: "include" })
       .then((r) => (r.ok ? r.json() : null))
       .then(setConfig)
       .catch(() => setConfig(null));

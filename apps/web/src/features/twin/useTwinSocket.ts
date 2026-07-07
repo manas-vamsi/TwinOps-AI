@@ -23,7 +23,9 @@ export function useTwinSocket() {
     let retry = 0;
 
     async function resnapshot() {
-      const res = await fetch(`${API_BASE}/api/v1/twin/graph`);
+      const res = await fetch(`${API_BASE}/api/v1/twin/graph`, {
+        credentials: "include",
+      });
       if (res.ok) {
         const store = useTwinStore.getState();
         store.applySnapshot((await res.json()) as SnapshotPayload, store.lastSeq);

@@ -11,7 +11,9 @@ export function wsUrl(): string {
 }
 
 export async function fetchScenarios(): Promise<Scenario[]> {
-  const res = await fetch(`${API_BASE}/api/v1/simulation/scenarios`);
+  const res = await fetch(`${API_BASE}/api/v1/simulation/scenarios`, {
+    credentials: "include",
+  });
   if (!res.ok) throw new Error("failed to load scenarios");
   return res.json();
 }
@@ -19,6 +21,7 @@ export async function fetchScenarios(): Promise<Scenario[]> {
 export async function injectScenario(id: string): Promise<void> {
   const res = await fetch(`${API_BASE}/api/v1/simulation/inject/${id}`, {
     method: "POST",
+    credentials: "include",
   });
   if (!res.ok) throw new Error("failed to inject scenario");
 }
@@ -26,6 +29,7 @@ export async function injectScenario(id: string): Promise<void> {
 export async function resetSimulation(): Promise<void> {
   const res = await fetch(`${API_BASE}/api/v1/simulation/reset`, {
     method: "POST",
+    credentials: "include",
   });
   if (!res.ok) throw new Error("failed to reset simulation");
 }

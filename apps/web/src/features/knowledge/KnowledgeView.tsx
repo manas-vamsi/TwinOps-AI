@@ -27,7 +27,7 @@ export function KnowledgeView() {
   const docParam = useSearchParams().get("doc");
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/v1/knowledge/docs`)
+    fetch(`${API_BASE}/api/v1/knowledge/docs`, { credentials: "include" })
       .then((r) => (r.ok ? r.json() : []))
       .then((d: Doc[]) => {
         setDocs(d);
@@ -40,7 +40,9 @@ export function KnowledgeView() {
     const q = query.trim();
     if (!q) return; // empty query: derived list shows all docs (no setState here)
     const t = setTimeout(() => {
-      fetch(`${API_BASE}/api/v1/knowledge/search?q=${encodeURIComponent(q)}`)
+      fetch(`${API_BASE}/api/v1/knowledge/search?q=${encodeURIComponent(q)}`, {
+        credentials: "include",
+      })
         .then((r) => (r.ok ? r.json() : []))
         .then(setHits)
         .catch(() => setHits([]));

@@ -16,6 +16,12 @@ class Settings(BaseSettings):
     # comma-separated in env: TWINOPS_CORS_ORIGINS='["http://localhost:3000"]'
     cors_origins: list[str] = ["http://localhost:3000"]
 
+    # auth is flag-gated: OFF by default so the local demo needs no login.
+    # Turn on for a public deploy: TWINOPS_AUTH_ENABLED=true (+ set a real password).
+    auth_enabled: bool = False
+    demo_user: str = "demo"
+    demo_password: str = "twinops-demo"
+
 
 @lru_cache
 def get_settings() -> Settings:
