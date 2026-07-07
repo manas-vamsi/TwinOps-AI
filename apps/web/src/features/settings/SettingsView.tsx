@@ -17,6 +17,7 @@ interface SystemConfig {
   workspace: string;
   providers: Provider[];
   llm_tokens_used: Record<string, number>;
+  llm_cache: { hits: number; misses: number; size: number; hit_rate_pct: number };
 }
 
 export function SettingsView() {
@@ -102,6 +103,13 @@ export function SettingsView() {
             No LLM tokens spent yet. Usage is metered per provider once a key is
             configured and the AI features are used.
           </p>
+        )}
+        {config && (
+          <Row
+            label="Response cache"
+            value={`${config.llm_cache.hit_rate_pct}% hit rate · ${config.llm_cache.size} entries`}
+            mono
+          />
         )}
       </Section>
     </div>

@@ -1102,6 +1102,13 @@
             },
             "type": "object",
             "title": "Llm Tokens Used"
+          },
+          "llm_cache": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Llm Cache"
           }
         },
         "type": "object",
@@ -1109,7 +1116,8 @@
           "sim_seed",
           "workspace",
           "providers",
-          "llm_tokens_used"
+          "llm_tokens_used",
+          "llm_cache"
         ],
         "title": "SystemConfig"
       },

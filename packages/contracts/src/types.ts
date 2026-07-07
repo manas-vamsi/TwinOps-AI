@@ -507,6 +507,10 @@ export interface components {
             llm_tokens_used: {
                 [key: string]: number;
             };
+            /** Llm Cache */
+            llm_cache: {
+                [key: string]: number;
+            };
         };
         /** TwinEdge */
         TwinEdge: {

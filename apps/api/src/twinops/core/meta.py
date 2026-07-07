@@ -21,6 +21,7 @@ class SystemConfig(BaseModel):
     workspace: str
     providers: list[Provider]
     llm_tokens_used: dict[str, int]  # cumulative tokens per provider (cost visibility)
+    llm_cache: dict[str, int]  # response-cache hits/misses/size/hit_rate_pct
 
 
 @router.get("/config")
@@ -30,6 +31,7 @@ async def get_config() -> SystemConfig:
         sim_seed=SEED,
         workspace="demo-workspace",
         llm_tokens_used=gateway.usage_summary(),
+        llm_cache=gateway.cache_stats(),
         providers=[
             Provider(id="ollama", label="Ollama (local)", kind="local", configured=True),
             Provider(
