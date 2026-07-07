@@ -29,6 +29,7 @@ async def run_ticker() -> None:
                     "active_scenario_id": twin_service.active_scenario_id,
                     "health": [h.model_dump() for h in twin_service.health.values()],
                     "incidents": [i.model_dump() for i in incident_service.open_incidents()],
+                    "predictions": [p.model_dump() for p in twin_service.predictions()],
                 },
             }
         )

@@ -3,6 +3,7 @@ import type { Incident, ReplayFrame } from "@/features/incidents/types";
 import type {
   DeltaPayload,
   NodeRuntime,
+  Prediction,
   SnapshotPayload,
   TwinEdgeSpec,
   TwinNodeSpec,
@@ -24,6 +25,7 @@ interface TwinState {
   edges: TwinEdgeSpec[];
   runtime: Record<string, NodeRuntime>;
   incidents: Incident[]; // open incidents, streamed live
+  predictions: Prediction[]; // heuristic failure forecasts, streamed live
   activeScenarioId: string | null;
   selectedNodeId: string | null;
   whatIfMode: boolean;
@@ -84,6 +86,7 @@ export const useTwinStore = create<TwinState>((set) => ({
   edges: [],
   runtime: {},
   incidents: [],
+  predictions: [],
   activeScenarioId: null,
   selectedNodeId: null,
   whatIfMode: false,
@@ -104,6 +107,7 @@ export const useTwinStore = create<TwinState>((set) => ({
         edges: p.edges,
         runtime,
         incidents: p.incidents ?? [],
+        predictions: p.predictions ?? [],
         activeScenarioId: p.active_scenario_id,
         lastSeq: seq,
       };
@@ -116,6 +120,7 @@ export const useTwinStore = create<TwinState>((set) => ({
       return {
         runtime,
         incidents: p.incidents ?? [],
+        predictions: p.predictions ?? [],
         activeScenarioId: p.active_scenario_id,
         lastSeq: seq,
       };

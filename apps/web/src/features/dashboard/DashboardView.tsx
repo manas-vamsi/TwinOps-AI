@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Activity, AlertTriangle, Boxes, HeartPulse } from "lucide-react";
+import { Activity, AlertTriangle, Boxes, HeartPulse, TrendingDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTwinStore } from "@/stores/twinStore";
 import { SEVERITY_STYLE } from "@/features/incidents/incidentStyle";
@@ -11,6 +11,7 @@ import { SEVERITY_STYLE } from "@/features/incidents/incidentStyle";
 export function DashboardView() {
   const runtime = useTwinStore((s) => s.runtime);
   const incidents = useTwinStore((s) => s.incidents);
+  const predictions = useTwinStore((s) => s.predictions);
   const nodeCount = useTwinStore((s) => s.nodes.length);
 
   const rts = Object.values(runtime);
@@ -81,6 +82,33 @@ export function DashboardView() {
           <Legend dot="bg-critical" label="Critical" n={counts.critical} />
         </div>
       </div>
+
+      {/* predicted failures */}
+      {predictions.length > 0 && (
+        <div className="rounded-2xl border border-warn/40 bg-surface p-5">
+          <div className="mb-3 flex items-center gap-2 text-xs uppercase tracking-wide text-faint">
+            <TrendingDown className="size-3.5 text-warn" aria-hidden />
+            Predicted failures
+          </div>
+          <div className="space-y-2">
+            {predictions.map((p) => (
+              <div
+                key={p.node_id}
+                className="flex items-center gap-3 rounded-xl border border-hairline bg-raised px-3 py-2.5"
+              >
+                <span className="size-2 rounded-full bg-warn" aria-hidden />
+                <span className="text-[13px] text-text">{p.label}</span>
+                <span className="text-xs text-warn">
+                  likely critical in ~{p.eta_seconds}s
+                </span>
+                <span className="ml-auto font-mono text-xs text-faint">
+                  {p.confidence}% confidence
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* active incidents */}
       <div className="rounded-2xl border border-hairline bg-surface p-5">

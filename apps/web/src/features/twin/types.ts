@@ -61,6 +61,13 @@ export function scoreToStatus(score: number): HealthStatus {
 
 import type { Incident } from "@/features/incidents/types";
 
+export interface Prediction {
+  node_id: string;
+  label: string;
+  eta_seconds: number;
+  confidence: number;
+}
+
 /** Wire types — what the server sends (snake_case, matches Pydantic schemas). */
 export interface WireMetrics {
   cpu: number;
@@ -82,10 +89,12 @@ export interface SnapshotPayload {
   edges: TwinEdgeSpec[];
   health: WireHealth[];
   incidents?: Incident[];
+  predictions?: Prediction[];
 }
 export interface DeltaPayload {
   tick: number;
   active_scenario_id: string | null;
   health: WireHealth[];
   incidents?: Incident[];
+  predictions?: Prediction[];
 }

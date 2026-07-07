@@ -76,6 +76,7 @@ const AGENTS: Agent[] = [
 
 export function AgentsView() {
   const incident = useTwinStore((s) => s.incidents[0] ?? null);
+  const prediction = useTwinStore((s) => s.predictions[0] ?? null);
   const active = incident !== null;
 
   return (
@@ -96,19 +97,27 @@ export function AgentsView() {
       <div className="grid gap-3 md:grid-cols-2">
         {AGENTS.map((agent) => {
           const Icon = agent.icon;
+          // the prediction agent works from live forecasts even before an incident
+          const isPredictionForecasting = agent.id === "prediction" && prediction !== null;
+          const agentActive = active || isPredictionForecasting;
+          const output = isPredictionForecasting
+            ? `${prediction!.label} likely critical in ~${prediction!.eta_seconds}s (${prediction!.confidence}% confidence)`
+            : active
+              ? agent.output(incident)
+              : "Standing by.";
           return (
             <div
               key={agent.id}
               className={cn(
                 "rounded-2xl border bg-surface p-4 transition-colors",
-                active ? "border-accent/30" : "border-hairline",
+                agentActive ? "border-accent/30" : "border-hairline",
               )}
             >
               <div className="flex items-center gap-3">
                 <div
                   className={cn(
                     "flex size-9 items-center justify-center rounded-xl border border-hairline bg-raised",
-                    active ? "text-accent" : "text-faint",
+                    agentActive ? "text-accent" : "text-faint",
                   )}
                 >
                   <Icon className="size-4" aria-hidden />
@@ -120,21 +129,21 @@ export function AgentsView() {
                 <span
                   className={cn(
                     "ml-auto inline-flex items-center gap-1.5 text-[11px]",
-                    active ? "text-accent" : "text-faint",
+                    agentActive ? "text-accent" : "text-faint",
                   )}
                 >
                   <span
                     className={cn(
                       "size-1.5 rounded-full",
-                      active ? "animate-pulse bg-accent" : "bg-faint",
+                      agentActive ? "animate-pulse bg-accent" : "bg-faint",
                     )}
                     aria-hidden
                   />
-                  {active ? "Working" : "Idle"}
+                  {agentActive ? "Working" : "Idle"}
                 </span>
               </div>
               <p className="mt-3 rounded-lg bg-raised px-3 py-2 text-[12px] text-muted">
-                {active ? agent.output(incident) : "Standing by."}
+                {output}
               </p>
             </div>
           );

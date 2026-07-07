@@ -2,10 +2,14 @@
 (BUS_MODE=inproc); the ticker calls advance(), the router/WS read snapshots."""
 
 import hashlib
+from collections import deque
 
+from twinops.modules.prediction.engine import Prediction, predict
 from twinops.modules.simulation.engine import FailureState, simulate_tick
 from twinops.modules.twin.schemas import GraphSnapshot, NodeHealth
 from twinops.modules.twin.topology import EDGES, NODES, SCENARIOS
+
+_HISTORY_LEN = 12
 
 
 def _topology_hash() -> str:
@@ -20,12 +24,24 @@ class TwinService:
         self.active_scenario_id: str | None = None
         self.health: dict[str, NodeHealth] = simulate_tick(0, None, None)
         self._hash = _topology_hash()
+        self._score_history: dict[str, deque[float]] = {
+            n.id: deque(maxlen=_HISTORY_LEN) for n in NODES
+        }
+        self._record_scores()
+
+    def _record_scores(self) -> None:
+        for node_id, h in self.health.items():
+            self._score_history[node_id].append(h.score)
 
     def advance(self) -> None:
         if self.failure is not None:
             self.failure.age += 1
         self.tick += 1
         self.health = simulate_tick(self.tick, self.failure, self.health)
+        self._record_scores()
+
+    def predictions(self) -> list[Prediction]:
+        return predict({k: list(v) for k, v in self._score_history.items()})
 
     def inject(self, scenario_id: str) -> bool:
         scenario = next((s for s in SCENARIOS if s.id == scenario_id), None)
@@ -39,6 +55,7 @@ class TwinService:
         self.failure = None
         self.active_scenario_id = None
         self.health = simulate_tick(self.tick, None, self.health)
+        self._record_scores()
 
     def snapshot(self) -> GraphSnapshot:
         return GraphSnapshot(

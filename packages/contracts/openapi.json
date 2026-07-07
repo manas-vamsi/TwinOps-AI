@@ -99,6 +99,32 @@
         }
       }
     },
+    "/api/v1/twin/predictions": {
+      "get": {
+        "tags": [
+          "twin"
+        ],
+        "summary": "Get Predictions",
+        "description": "Heuristic failure forecasts: nodes trending toward critical, with ETAs.",
+        "operationId": "get_predictions_api_v1_twin_predictions_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Prediction"
+                  },
+                  "type": "array",
+                  "title": "Response Get Predictions Api V1 Twin Predictions Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/simulation/scenarios": {
       "get": {
         "tags": [
@@ -831,6 +857,34 @@
           "metrics"
         ],
         "title": "NodeHealth"
+      },
+      "Prediction": {
+        "properties": {
+          "node_id": {
+            "type": "string",
+            "title": "Node Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "eta_seconds": {
+            "type": "integer",
+            "title": "Eta Seconds"
+          },
+          "confidence": {
+            "type": "integer",
+            "title": "Confidence"
+          }
+        },
+        "type": "object",
+        "required": [
+          "node_id",
+          "label",
+          "eta_seconds",
+          "confidence"
+        ],
+        "title": "Prediction"
       },
       "Provider": {
         "properties": {

@@ -84,6 +84,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/twin/predictions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Predictions
+         * @description Heuristic failure forecasts: nodes trending toward critical, with ETAs.
+         */
+        get: operations["get_predictions_api_v1_twin_predictions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/simulation/scenarios": {
         parameters: {
             query?: never;
@@ -392,6 +412,17 @@ export interface components {
             status: "healthy" | "degraded" | "critical";
             metrics: components["schemas"]["Metrics"];
         };
+        /** Prediction */
+        Prediction: {
+            /** Node Id */
+            node_id: string;
+            /** Label */
+            label: string;
+            /** Eta Seconds */
+            eta_seconds: number;
+            /** Confidence */
+            confidence: number;
+        };
         /** Provider */
         Provider: {
             /** Id */
@@ -596,6 +627,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["GraphSnapshot"];
+                };
+            };
+        };
+    };
+    get_predictions_api_v1_twin_predictions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Prediction"][];
                 };
             };
         };
