@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from twinops import __version__
 from twinops.core.config import get_settings
+from twinops.core.errors import register_error_handlers
 from twinops.core.health import router as health_router
 from twinops.core.logging import configure_logging
 from twinops.core.meta import router as meta_router
@@ -54,6 +55,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
     app.middleware("http")(request_id_middleware)
+    register_error_handlers(app)
 
     app.include_router(health_router)
     app.include_router(meta_router)

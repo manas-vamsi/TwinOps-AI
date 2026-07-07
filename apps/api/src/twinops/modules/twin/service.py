@@ -2,6 +2,7 @@
 (BUS_MODE=inproc); the ticker calls advance(), the router/WS read snapshots."""
 
 import hashlib
+import time
 from collections import deque
 
 from twinops.modules.prediction.engine import Prediction, predict
@@ -27,6 +28,7 @@ class TwinService:
         self._score_history: dict[str, deque[float]] = {
             n.id: deque(maxlen=_HISTORY_LEN) for n in NODES
         }
+        self.last_advance = time.monotonic()  # ticker liveness heartbeat
         self._record_scores()
 
     def _record_scores(self) -> None:
@@ -38,6 +40,7 @@ class TwinService:
             self.failure.age += 1
         self.tick += 1
         self.health = simulate_tick(self.tick, self.failure, self.health)
+        self.last_advance = time.monotonic()
         self._record_scores()
 
     def predictions(self) -> list[Prediction]:
