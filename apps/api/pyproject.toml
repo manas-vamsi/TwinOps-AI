@@ -47,6 +47,7 @@ root = "tests"
 reportUnknownMemberType = false
 reportUnknownVariableType = false
 reportUnknownArgumentType = false
+reportPrivateUsage = false
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -1,5 +1,6 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
+from twinops.core.ratelimit import rate_limit
 from twinops.modules.knowledge.service import (
     KnowledgeDoc,
     SearchHit,
@@ -11,7 +12,10 @@ from twinops.modules.knowledge.service import (
 router = APIRouter(prefix="/api/v1", tags=["knowledge"])
 
 
-@router.get("/knowledge/search")
+@router.get(
+    "/knowledge/search",
+    dependencies=[Depends(rate_limit("search", max_calls=60, window_s=60))],
+)
 async def knowledge_search(q: str = "") -> list[SearchHit]:
     return search(q)
 

@@ -1,5 +1,6 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
+from twinops.core.ratelimit import rate_limit
 from twinops.modules.incidents.narrative import Narrative, incident_narrative
 from twinops.modules.incidents.replay import ReplayResponse, build_replay
 from twinops.modules.incidents.schemas import Incident
@@ -32,7 +33,10 @@ async def get_replay(incident_id: str) -> ReplayResponse:
     return replay
 
 
-@router.get("/incidents/{incident_id}/narrative")
+@router.get(
+    "/incidents/{incident_id}/narrative",
+    dependencies=[Depends(rate_limit("narrative", max_calls=20, window_s=60))],
+)
 async def get_narrative(incident_id: str) -> Narrative:
     inc = incident_service.incidents.get(incident_id)
     if inc is None:
