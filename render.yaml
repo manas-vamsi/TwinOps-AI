@@ -1,0 +1,23 @@
+# Render Blueprint for the TwinOps API (free tier). The web app goes to Vercel
+# (see docs/DEPLOY.md). One stateless container — no DB/Redis to provision.
+services:
+  - type: web
+    name: twinops-api
+    runtime: docker
+    dockerfilePath: ./apps/api/Dockerfile
+    dockerContext: ./apps/api
+    plan: free
+    healthCheckPath: /healthz
+    envVars:
+      - key: TWINOPS_ENV
+        value: prod
+      # set to your Vercel web URL, e.g. https://twinops.vercel.app
+      - key: TWINOPS_CORS_ORIGINS
+        sync: false
+      # at least one LLM provider key (all optional; app runs without them)
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
