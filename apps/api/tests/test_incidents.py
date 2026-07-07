@@ -73,6 +73,36 @@ def test_narrative_falls_back_to_deterministic_without_a_provider(monkeypatch) -
     assert len(n.text) > 0
 
 
+def test_narrative_guardrail_rejects_a_hallucinated_llm_answer(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    """If the LLM invents a component outside the incident, the guardrail
+    discards it and uses the deterministic answer — no hallucination surfaces."""
+    from twinops.modules.incidents import narrative as narrative_mod
+
+    svc = IncidentService()
+    svc.evaluate(_health_with_failure("db-orders-pg", age=10), tick=10)
+    inc = svc.incidents[svc.open_id]  # type: ignore[index]
+    narrative_mod._cache.clear()
+
+    # LLM names an unrelated component (Payment Service) not in this incident
+    monkeypatch.setattr(
+        narrative_mod.gateway,
+        "complete",
+        lambda *a, **k: "Orders Postgres failed, and Payment Service is also to blame.",
+    )
+    rejected = narrative_mod.incident_narrative(inc)
+    assert rejected.source == "deterministic"  # guardrail kicked in
+
+    # a clean, grounded answer is accepted
+    narrative_mod._cache.clear()
+    monkeypatch.setattr(
+        narrative_mod.gateway,
+        "complete",
+        lambda *a, **k: "Orders Postgres saturated its connection pool.",
+    )
+    accepted = narrative_mod.incident_narrative(inc)
+    assert accepted.source == "llm"
+
+
 def test_incidents_endpoint() -> None:
     client = TestClient(create_app())
     res = client.get("/api/v1/incidents")

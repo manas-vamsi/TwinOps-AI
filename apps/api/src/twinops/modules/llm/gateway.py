@@ -120,6 +120,7 @@ def complete(prompt: str, system: str | None = None, max_tokens: int = 320) -> s
     hit = _cache.get(key)
     if hit and hit[0] > now:
         _metrics["hits"] += 1
+        log.info("llm_cache_hit", hit_rate_pct=cache_stats()["hit_rate_pct"])
         return hit[1]
     _metrics["misses"] += 1
 
@@ -156,7 +157,13 @@ def complete(prompt: str, system: str | None = None, max_tokens: int = 320) -> s
                 _cache[key] = (now + _CACHE_TTL, out)
                 if len(_cache) > _CACHE_MAX:
                     _cache.pop(next(iter(_cache)))  # drop oldest (insertion order)
-                log.info("llm_ok", provider=name, model=model)
+                log.info(
+                    "llm_ok",
+                    provider=name,
+                    model=model,
+                    latency_ms=round((time.monotonic() - now) * 1000),
+                    tokens=(resp.usage.total_tokens if resp.usage else None),
+                )
                 return out
         except Exception as exc:  # network / auth / bad model — trip breaker, try next
             _fail_counts[name] += 1

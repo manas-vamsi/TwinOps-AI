@@ -7,10 +7,14 @@ configured or the call fails. Never runs per-tick — only when a client asks.
 
 from typing import Literal
 
+import structlog
 from pydantic import BaseModel
 
+from twinops.modules.eval.grounding import grounding_score
 from twinops.modules.incidents.schemas import Incident
 from twinops.modules.llm import gateway
+
+log = structlog.get_logger()
 
 _SYSTEM = (
     "You are an SRE incident assistant. In 2-3 sentences, explain what happened "
@@ -53,8 +57,15 @@ def incident_narrative(inc: Incident) -> Narrative:
     )
     llm = gateway.complete(prompt, system=_SYSTEM)
     if llm:
-        result = Narrative(text=llm, source="llm", provider=gateway.active_provider())
-        _cache[inc.id] = result
-        return result
+        # self-checking guardrail: never surface an LLM answer that invents a
+        # component outside this incident. Loose phrasing is fine; hallucinated
+        # services are not — if found, discard the LLM output for deterministic.
+        _, issues = grounding_score(llm, inc)
+        hallucinations = [i for i in issues if i.startswith("mentions unrelated component")]
+        if not hallucinations:
+            result = Narrative(text=llm, source="llm", provider=gateway.active_provider())
+            _cache[inc.id] = result
+            return result
+        log.warning("narrative_ungrounded_rejected", incident=inc.id, issues=hallucinations)
 
     return Narrative(text=deterministic, source="deterministic", provider=None)
