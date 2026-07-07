@@ -23,13 +23,34 @@ export function Copilot() {
     { role: "assistant", text: "Ask me about your infrastructure — what's failing, why, or what to do." },
   ]);
 
-  function ask(q: string) {
+  async function ask(q: string) {
     const query = q.trim();
     if (!query) return;
-    const { runtime, incidents } = useTwinStore.getState();
-    const a = answer(query, runtime, incidents);
-    setMsgs((m) => [...m, { role: "user", text: query }, { role: "assistant", text: a.text, action: a.action }]);
     setInput("");
+    setMsgs((m) => [...m, { role: "user", text: query }]);
+
+    // primary: server copilot (LLM, grounded). fallback: local deterministic.
+    try {
+      const base = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000";
+      const res = await fetch(`${base}/api/v1/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: query }),
+      });
+      if (!res.ok) throw new Error("chat failed");
+      const data = (await res.json()) as {
+        text: string;
+        action?: CopilotAnswer["action"] | null;
+      };
+      setMsgs((m) => [
+        ...m,
+        { role: "assistant", text: data.text, action: data.action ?? undefined },
+      ]);
+    } catch {
+      const { runtime, incidents } = useTwinStore.getState();
+      const a = answer(query, runtime, incidents);
+      setMsgs((m) => [...m, { role: "assistant", text: a.text, action: a.action }]);
+    }
   }
 
   return (

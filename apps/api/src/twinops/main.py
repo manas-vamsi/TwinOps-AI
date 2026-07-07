@@ -13,6 +13,7 @@ from twinops.core.health import router as health_router
 from twinops.core.logging import configure_logging
 from twinops.core.meta import router as meta_router
 from twinops.core.request_id import request_id_middleware
+from twinops.modules.chat.router import router as chat_router
 from twinops.modules.incidents.router import router as incidents_router
 from twinops.modules.knowledge.router import router as knowledge_router
 from twinops.modules.twin.router import router as twin_router
@@ -59,6 +60,7 @@ def create_app() -> FastAPI:
     app.include_router(twin_router)
     app.include_router(incidents_router)
     app.include_router(knowledge_router)
+    app.include_router(chat_router)
     app.include_router(ws_router)
 
     log.info("app_created", env=settings.env, version=__version__)
