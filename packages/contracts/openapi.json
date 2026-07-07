@@ -1095,13 +1095,21 @@
             },
             "type": "array",
             "title": "Providers"
+          },
+          "llm_tokens_used": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Llm Tokens Used"
           }
         },
         "type": "object",
         "required": [
           "sim_seed",
           "workspace",
-          "providers"
+          "providers",
+          "llm_tokens_used"
         ],
         "title": "SystemConfig"
       },

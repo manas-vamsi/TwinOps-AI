@@ -503,6 +503,10 @@ export interface components {
             workspace: string;
             /** Providers */
             providers: components["schemas"]["Provider"][];
+            /** Llm Tokens Used */
+            llm_tokens_used: {
+                [key: string]: number;
+            };
         };
         /** TwinEdge */
         TwinEdge: {

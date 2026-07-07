@@ -16,6 +16,7 @@ interface SystemConfig {
   sim_seed: number;
   workspace: string;
   providers: Provider[];
+  llm_tokens_used: Record<string, number>;
 }
 
 export function SettingsView() {
@@ -89,6 +90,19 @@ export function SettingsView() {
           Deterministic: the same seed reproduces the same run, so demos and
           replays are identical.
         </p>
+      </Section>
+
+      <Section title="AI Usage">
+        {config && Object.keys(config.llm_tokens_used).length > 0 ? (
+          Object.entries(config.llm_tokens_used).map(([provider, tokens]) => (
+            <Row key={provider} label={provider} value={`${tokens.toLocaleString()} tokens`} mono />
+          ))
+        ) : (
+          <p className="text-xs text-faint">
+            No LLM tokens spent yet. Usage is metered per provider once a key is
+            configured and the AI features are used.
+          </p>
+        )}
       </Section>
     </div>
   );

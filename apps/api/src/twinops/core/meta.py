@@ -3,6 +3,7 @@ import os
 from fastapi import APIRouter
 from pydantic import BaseModel
 
+from twinops.modules.llm import gateway
 from twinops.modules.simulation.engine import SEED
 
 router = APIRouter(prefix="/api/v1", tags=["meta"])
@@ -19,6 +20,7 @@ class SystemConfig(BaseModel):
     sim_seed: int
     workspace: str
     providers: list[Provider]
+    llm_tokens_used: dict[str, int]  # cumulative tokens per provider (cost visibility)
 
 
 @router.get("/config")
@@ -27,6 +29,7 @@ async def get_config() -> SystemConfig:
     return SystemConfig(
         sim_seed=SEED,
         workspace="demo-workspace",
+        llm_tokens_used=gateway.usage_summary(),
         providers=[
             Provider(id="ollama", label="Ollama (local)", kind="local", configured=True),
             Provider(
