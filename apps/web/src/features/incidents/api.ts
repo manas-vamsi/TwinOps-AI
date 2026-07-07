@@ -15,3 +15,15 @@ export async function fetchReplay(incidentId: string): Promise<ReplayResponse> {
   if (!res.ok) throw new Error("failed to load replay");
   return res.json();
 }
+
+export interface Narrative {
+  text: string;
+  source: "llm" | "deterministic";
+  provider: string | null;
+}
+
+export async function fetchNarrative(incidentId: string): Promise<Narrative> {
+  const res = await fetch(`${API_BASE}/api/v1/incidents/${incidentId}/narrative`);
+  if (!res.ok) throw new Error("failed to load narrative");
+  return res.json();
+}

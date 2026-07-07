@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { useTwinStore } from "@/stores/twinStore";
 import { fetchIncidents, fetchReplay } from "./api";
 import { RootCauseCard } from "./RootCauseCard";
+import { AiNarrative } from "./AiNarrative";
 import { downloadPostmortem } from "./postmortem";
 import { SEVERITY_STYLE, STATUS_LABEL } from "./incidentStyle";
 import type { Incident } from "./types";
@@ -162,6 +163,10 @@ function IncidentWorkspace({ incident }: { incident: Incident }) {
           </button>
         </div>
       </div>
+
+      {/* AI explanation (on-demand, grounded in the evidence). key= remounts
+          per incident so state resets cleanly. */}
+      {incident.root_cause && <AiNarrative key={incident.id} incidentId={incident.id} />}
 
       {/* root cause */}
       {incident.root_cause ? (

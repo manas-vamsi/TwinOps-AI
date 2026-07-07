@@ -296,6 +296,48 @@
         }
       }
     },
+    "/api/v1/incidents/{incident_id}/narrative": {
+      "get": {
+        "tags": [
+          "incidents"
+        ],
+        "summary": "Get Narrative",
+        "operationId": "get_narrative_api_v1_incidents__incident_id__narrative_get",
+        "parameters": [
+          {
+            "name": "incident_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Incident Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Narrative"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/knowledge/search": {
       "get": {
         "tags": [
@@ -606,6 +648,40 @@
           "error_rate"
         ],
         "title": "Metrics"
+      },
+      "Narrative": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "llm",
+              "deterministic"
+            ],
+            "title": "Source"
+          },
+          "provider": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text",
+          "source",
+          "provider"
+        ],
+        "title": "Narrative"
       },
       "NodeHealth": {
         "properties": {

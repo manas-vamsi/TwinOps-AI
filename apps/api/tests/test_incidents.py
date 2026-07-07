@@ -56,6 +56,23 @@ def test_replay_reconstructs_the_cascade() -> None:
     assert last < first
 
 
+def test_narrative_falls_back_to_deterministic_without_a_provider(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    # no provider keys in the test env -> gateway returns None -> deterministic
+    from twinops.modules.incidents.narrative import incident_narrative
+
+    for var in ("GROQ_API_KEY", "GEMINI_API_KEY", "OPENROUTER_API_KEY"):
+        monkeypatch.delenv(var, raising=False)
+
+    svc = IncidentService()
+    svc.evaluate(_health_with_failure("svc-payment", age=8), tick=8)
+    inc = svc.incidents[svc.open_id]  # type: ignore[index]
+    n = incident_narrative(inc)
+
+    assert n.source == "deterministic"
+    assert n.provider is None
+    assert len(n.text) > 0
+
+
 def test_incidents_endpoint() -> None:
     client = TestClient(create_app())
     res = client.get("/api/v1/incidents")

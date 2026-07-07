@@ -3,6 +3,7 @@ from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 import structlog
+from dotenv import find_dotenv, load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -31,6 +32,9 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None]:
 
 
 def create_app() -> FastAPI:
+    # load the repo-root .env regardless of CWD so provider keys
+    # (GEMINI/GROQ/OPENROUTER) reach the LLM gateway
+    load_dotenv(find_dotenv(usecwd=True))
     configure_logging()
     settings = get_settings()
 

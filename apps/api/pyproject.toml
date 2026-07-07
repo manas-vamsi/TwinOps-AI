@@ -8,6 +8,8 @@ dependencies = [
     "uvicorn[standard]>=0.30",
     "pydantic-settings>=2.4",
     "structlog>=24.4",
+    "openai>=1.40",
+    "python-dotenv>=1.0",
 ]
 
 [dependency-groups]
