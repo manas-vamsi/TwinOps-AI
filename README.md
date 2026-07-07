@@ -19,7 +19,7 @@ Monitoring tools answer *"what happened?"*. TwinOps AI answers **why it happened
 - **Live Digital Twin** — an interactive dependency graph of servers, databases, APIs, queues, and services; every node health-tinted in real time, failures visibly cascading along dependency edges.
 - **Explainable AI incident pipeline** — six cooperating agents (monitoring → investigation → knowledge → prediction → recommendation → reporting) produce a root cause with **evidence-weighted confidence**, cited runbooks, recommended actions, and an ETA. The confidence number is *computed from evidence, never hallucinated*.
 - **Deterministic simulation engine** — a seeded, replayable simulation of a realistic enterprise topology (30–200 nodes) with 8 scripted failure scenarios drives the entire product. Same seed + same scenario = identical run: that one property powers reproducible demos, incident replay, and honest tests.
-- **Knowledge Hub (RAG)** — runbooks and past incidents retrieved with citations; a global natural-language search ("why is payment slow?") that answers across metrics, incidents, and docs.
+- **Knowledge Hub** — a searchable runbook library; the AI root cause links straight to the runbook that fixes each incident. (Keyword search today; semantic RAG is the next layer.)
 
 ## The demo moment
 
@@ -32,14 +32,25 @@ Monitoring tools answer *"what happened?"*. TwinOps AI answers **why it happened
 ## Architecture at a glance
 
 ```
- Next.js 15 (Vercel/local) ── REST + WebSocket/SSE ── FastAPI modular monolith (Docker)
-   twin canvas · incident        snapshot + delta        twin · incidents · agents(LangGraph)
-   workspace · copilot                                   knowledge(RAG) · simulation · telemetry
-                                                              │ Redis(Valkey) event bus
-                                              PostgreSQL · ChromaDB(embedded) · Ollama/Gemini/Claude/OpenAI
+ Next.js 16 (light/dark)  ── REST + WebSocket ──  FastAPI modular monolith (Docker)
+   twin · incidents ·          snapshot + delta      simulation · twin · incidents · agents
+   dashboard · copilot                               knowledge · prediction · llm gateway
+                                                          │ in-process event bus + ticker
+                              LLM gateway → Ollama / Groq / Gemini / OpenRouter (OpenAI-compatible)
 ```
 
 Deterministic core, LLMs at the edges. Full design, diagrams, and every decision's rationale: **[ARCHITECTURE.md](ARCHITECTURE.md)**.
+
+## What's built
+
+All eight surfaces are live and driven by real data:
+
+- **Digital Twin** — interactive dependency graph, live health over WebSocket, inject-failure → visible cascade, click-for-detail, plus a **what-if blast-radius preview** (click a healthy node to see what its failure would take down).
+- **Incidents** — auto-detected, with an **inferred** root cause (from topology + health, not hallucinated), evidence-weighted confidence, recommended actions, an **LLM explanation**, the linked runbook, **postmortem export**, and **replay on the twin**.
+- **Dashboard** — global health, active incidents, and **predicted failures** ("likely critical in ~Ns").
+- **AI Agents** — the six-agent pipeline visualized working the live incident.
+- **Knowledge Hub** · **Infrastructure** · **Analytics** · **Settings** — searchable runbooks, live inventory, MTTR/frequency/severity, and provider + sim-seed config.
+- **Copilot** — a floating assistant that answers from live state (LLM-backed, deterministic fallback) and navigates the app.
 
 ## Runs for $0
 
@@ -55,6 +66,15 @@ cd apps/api && uv run uvicorn twinops.main:app --reload   # api → http://local
 ```
 
 Prereqs: Node 22+, pnpm, [uv](https://docs.astral.sh/uv/), Docker.
+
+## Engineering
+
+- **Deterministic core, LLM at the edges** — detection, cascade, root cause, and prediction are seeded and reproducible (instant, testable); the LLM only enriches on demand and **degrades gracefully** to deterministic output if a provider is missing or a call fails.
+- **Snapshot + delta realtime** — REST snapshot, sequenced WebSocket deltas, seq-gap re-snapshot, backoff reconnect; one app-wide socket.
+- **Single source of truth contracts** — Pydantic → OpenAPI → generated TypeScript types, enforced by a CI drift gate so frontend and backend can't diverge.
+- **Security** — secrets server-side only (never bundled to the browser), per-IP rate limiting on mutating + LLM endpoints, prompt-injection-guarded LLM prompts, input validation at every boundary.
+- **Tested** — 42 automated tests (pytest + vitest), strict typing (pyright + tsc), ruff + eslint, all run in GitHub Actions on every push.
+- **$0, local-first** — one `docker compose up`; no paid API key required to run.
 
 ## Documentation
 
