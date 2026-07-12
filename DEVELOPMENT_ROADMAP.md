@@ -4,7 +4,7 @@ Six phases. Every phase ends with a **demoable exit criterion** (a sentence you 
 
 **Strategy: shareable at every phase boundary.** After P2, a "P5-lite" pass (README GIF, 2-minute video, deployed demo) makes the project presentable *early* — later phases improve what's already shareable, so there is never a moment where the repo is half-built with nothing to show.
 
-**Progress (2026-07-06):** P0 ✅ · Fujitsu rebrand + light/dark theme ✅ · P1 ✅ (twin + backend sim + WebSocket streaming) · P2 ✅ (incident detection + deterministic root-cause + workspace; LLM narration deferred) · P3 🟡 (Knowledge Hub with keyword search; semantic RAG pending) · P4 🟡 (dashboard, agents view, analytics, infrastructure done; notifications, copilot, replay, what-if pending) · P5 🟡 (settings + /config done; auth, deploy, demo script pending). **All 8 nav surfaces render real, live data.**
+**Progress (2026-07-12):** P0 ✅ · Fujitsu rebrand + light/dark theme ✅ · P1 ✅ (twin + backend sim + WebSocket streaming) · P2 ✅ (incident detection + deterministic root-cause + workspace + LLM narration with fallback chain, response cache, per-provider circuit breaker, grounding guardrail, eval harness) · P3 🟡 (Knowledge Hub with keyword search + RCA runbook citation; semantic RAG pending) · P4 ✅ (dashboard, agents view, analytics, infrastructure, notifications, copilot, replay, what-if, postmortem export, all 8 scenarios) · P5 🟡 (settings + /config ✅, flag-gated auth ✅, RFC-7807 errors + /readyz ✅, demo script ✅, deploy config written ✅ but **not yet deployed**; unified NL search pending). **All 8 nav surfaces render real, live data.**
 
 | Phase | Weeks | Builds | Exit criterion |
 |-------|-------|--------|----------------|
