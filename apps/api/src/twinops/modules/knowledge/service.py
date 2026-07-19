@@ -1,14 +1,22 @@
 """Knowledge base over the authored runbook corpus.
 
-ponytail: keyword search (title-weighted term frequency) — honest and useful
-today. Semantic RAG via embeddings + a vector store is the next layer; the
-search() seam stays the same when it lands.
+Search is hybrid: keyword score (title-weighted term frequency) blended with
+semantic similarity from Ollama embeddings when the local Ollama is reachable.
+ponytail: in-memory cosine over the whole corpus — a vector store (ChromaDB)
+only earns its keep once the corpus outgrows a single embed batch (~100 docs).
+If Ollama is down, search degrades to keyword-only; it never fails.
 """
 
+import math
+import os
 import re
 from pathlib import Path
 
+import httpx
+import structlog
 from pydantic import BaseModel
+
+log = structlog.get_logger()
 
 
 class KnowledgeDoc(BaseModel):
@@ -60,18 +68,60 @@ def get_doc(doc_id: str) -> KnowledgeDoc | None:
     return _DOCS.get(doc_id)
 
 
+_OLLAMA_URL = os.environ.get("TWINOPS_OLLAMA_URL", "http://localhost:11434")
+_EMBED_MODEL = os.environ.get("TWINOPS_EMBED_MODEL", "qwen2.5:3b")
+
+# doc id -> embedding, built lazily on first semantic search; None = not built yet
+_doc_vecs: dict[str, list[float]] | None = None
+
+
+def _embed(texts: list[str]) -> list[list[float]]:
+    resp = httpx.post(
+        f"{_OLLAMA_URL}/api/embed",
+        json={"model": _EMBED_MODEL, "input": texts},
+        timeout=30,
+    )
+    resp.raise_for_status()
+    return resp.json()["embeddings"]
+
+
+def _cosine(a: list[float], b: list[float]) -> float:
+    dot = sum(x * y for x, y in zip(a, b, strict=True))
+    na = math.sqrt(sum(x * x for x in a))
+    nb = math.sqrt(sum(x * x for x in b))
+    return dot / (na * nb) if na and nb else 0.0
+
+
+def _semantic_scores(query: str) -> dict[str, float] | None:
+    """Cosine similarity per doc, or None when Ollama is unreachable."""
+    global _doc_vecs
+    try:
+        if _doc_vecs is None:
+            vecs = _embed([f"{d.title}\n{d.body[:2000]}" for d in _DOCS.values()])
+            _doc_vecs = dict(zip(_DOCS, vecs, strict=True))
+        qv = _embed([query])[0]
+        return {doc_id: _cosine(qv, v) for doc_id, v in _doc_vecs.items()}
+    except Exception as exc:
+        log.warning("semantic_search_unavailable", error=str(exc))
+        return None
+
+
+def _keyword_score(doc: KnowledgeDoc, terms: list[str]) -> int:
+    title_toks = _tokens(doc.title)
+    body_toks = _tokens(doc.body)
+    return sum(3 * title_toks.count(t) + body_toks.count(t) for t in terms)
+
+
 def search(query: str) -> list[SearchHit]:
     terms = _tokens(query)
     if not terms:
         return []
+    semantic = _semantic_scores(query)
     hits: list[SearchHit] = []
     for doc in _DOCS.values():
-        title_toks = _tokens(doc.title)
-        body_toks = _tokens(doc.body)
-        score = 0
-        for t in terms:
-            score += 3 * title_toks.count(t)
-            score += body_toks.count(t)
+        kw = _keyword_score(doc, terms)
+        # semantic on: cosine (scaled) ranks, keyword matches boost; off: keyword only
+        score = round(100 * semantic[doc.id]) + kw if semantic else kw
         if score > 0:
             snippet = " ".join(doc.body.split()[:32]).lstrip("# ")
             hits.append(SearchHit(id=doc.id, title=doc.title, snippet=snippet, score=score))
