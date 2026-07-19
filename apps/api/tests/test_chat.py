@@ -10,6 +10,15 @@ def test_chat_falls_back_to_deterministic_without_provider(monkeypatch) -> None:
     assert "Components:" in resp.text
 
 
+def test_chat_cites_relevant_runbook(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    for var in ("GROQ_API_KEY", "GEMINI_API_KEY", "OPENROUTER_API_KEY"):
+        monkeypatch.delenv(var, raising=False)
+    resp = answer_chat("why is payment slow?")
+    ids = [c.id for c in resp.citations]
+    assert "payment-provider-latency" in ids
+    assert resp.citations[0].href.startswith("/knowledge?doc=")
+
+
 def test_suggested_action_routes_by_keyword() -> None:
     assert _suggested_action("why is this happening?").href == "/incidents"  # type: ignore[union-attr]
     assert _suggested_action("show me the runbook").href == "/knowledge"  # type: ignore[union-attr]

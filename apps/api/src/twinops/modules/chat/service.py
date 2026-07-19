@@ -1,12 +1,15 @@
-"""Copilot chat. Grounds the LLM in live server state (never trusts the client
-for facts), refuses prompt-injection, and falls back to a deterministic summary
-if no provider is configured or the call fails. Read-only — no tools mutate."""
+"""Copilot chat — the unified NL search surface. Grounds the LLM in live
+server state AND the runbook corpus (never trusts the client for facts),
+returns the runbooks it drew on as citations, refuses prompt-injection, and
+falls back to a deterministic summary if no provider is configured or the
+call fails. Read-only — no tools mutate."""
 
 from typing import Literal
 
 from pydantic import BaseModel
 
 from twinops.modules.incidents.service import incident_service
+from twinops.modules.knowledge import service as knowledge
 from twinops.modules.llm import gateway
 from twinops.modules.twin.service import twin_service
 
@@ -23,6 +26,12 @@ class Action(BaseModel):
     href: str
 
 
+class Citation(BaseModel):
+    id: str
+    title: str
+    href: str
+
+
 class ChatRequest(BaseModel):
     message: str
 
@@ -32,6 +41,7 @@ class ChatResponse(BaseModel):
     source: Literal["llm", "deterministic"]
     provider: str | None
     action: Action | None
+    citations: list[Citation] = []
 
 
 def _context() -> str:
@@ -63,15 +73,36 @@ def _suggested_action(message: str) -> Action | None:
     return None
 
 
+def _cited_runbooks(message: str) -> tuple[str, list[Citation]]:
+    """Top runbook excerpts for the prompt + the matching citations."""
+    hits = knowledge.search(message)[:2]
+    excerpts: list[str] = []
+    citations: list[Citation] = []
+    for hit in hits:
+        doc = knowledge.get_doc(hit.id)
+        if doc is None:
+            continue
+        excerpts.append(f"RUNBOOK [{doc.title}]:\n{doc.body[:1200]}")
+        citations.append(Citation(id=doc.id, title=doc.title, href=f"/knowledge?doc={doc.id}"))
+    return "\n\n".join(excerpts), citations
+
+
 def answer_chat(message: str) -> ChatResponse:
     context = _context()
     action = _suggested_action(message)
-    prompt = f"CONTEXT:\n{context}\n\nUSER QUESTION: {message}"
+    runbooks, citations = _cited_runbooks(message)
+    prompt = f"CONTEXT:\n{context}\n\n{runbooks}\n\nUSER QUESTION: {message}"
 
     llm = gateway.complete(prompt, system=_SYSTEM, max_tokens=200)
     if llm:
         return ChatResponse(
-            text=llm, source="llm", provider=gateway.active_provider(), action=action
+            text=llm,
+            source="llm",
+            provider=gateway.active_provider(),
+            action=action,
+            citations=citations,
         )
     # deterministic fallback: the grounded context itself is a useful answer
-    return ChatResponse(text=context, source="deterministic", provider=None, action=action)
+    return ChatResponse(
+        text=context, source="deterministic", provider=None, action=action, citations=citations
+    )

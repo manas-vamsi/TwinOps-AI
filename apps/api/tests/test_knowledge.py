@@ -30,5 +30,6 @@ def test_semantic_ranking_blends_cosine(monkeypatch) -> None:
 def test_search_survives_ollama_down(monkeypatch) -> None:
     monkeypatch.setattr(service, "_OLLAMA_URL", "http://127.0.0.1:9")  # unroutable
     monkeypatch.setattr(service, "_doc_vecs", None)
+    monkeypatch.setattr(service, "_down_until", 0.0)
     hits = search("database connection pool")
     assert hits and hits[0].id == "db-connection-pool-exhaustion"

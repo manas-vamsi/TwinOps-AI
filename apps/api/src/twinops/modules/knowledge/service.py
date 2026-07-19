@@ -10,6 +10,7 @@ If Ollama is down, search degrades to keyword-only; it never fails.
 import math
 import os
 import re
+import time
 from pathlib import Path
 
 import httpx
@@ -74,6 +75,11 @@ _EMBED_MODEL = os.environ.get("TWINOPS_EMBED_MODEL", "qwen2.5:3b")
 # doc id -> embedding, built lazily on first semantic search; None = not built yet
 _doc_vecs: dict[str, list[float]] | None = None
 
+# negative cache: after a failed embed, skip semantic search for a cooldown so
+# every request doesn't pay a connection-refused round trip while Ollama is down
+_RETRY_COOLDOWN_S = 60.0
+_down_until = 0.0
+
 
 def _embed(texts: list[str]) -> list[list[float]]:
     resp = httpx.post(
@@ -94,7 +100,9 @@ def _cosine(a: list[float], b: list[float]) -> float:
 
 def _semantic_scores(query: str) -> dict[str, float] | None:
     """Cosine similarity per doc, or None when Ollama is unreachable."""
-    global _doc_vecs
+    global _doc_vecs, _down_until
+    if time.monotonic() < _down_until:
+        return None
     try:
         if _doc_vecs is None:
             vecs = _embed([f"{d.title}\n{d.body[:2000]}" for d in _DOCS.values()])
@@ -102,7 +110,10 @@ def _semantic_scores(query: str) -> dict[str, float] | None:
         qv = _embed([query])[0]
         return {doc_id: _cosine(qv, v) for doc_id, v in _doc_vecs.items()}
     except Exception as exc:
-        log.warning("semantic_search_unavailable", error=str(exc))
+        _down_until = time.monotonic() + _RETRY_COOLDOWN_S
+        log.warning(
+            "semantic_search_unavailable", error=str(exc), retry_in_s=_RETRY_COOLDOWN_S
+        )
         return None
 
 

@@ -7,10 +7,17 @@ import { cn } from "@/lib/utils";
 import { useTwinStore } from "@/stores/twinStore";
 import { answer, SUGGESTIONS, type CopilotAnswer } from "./intents";
 
+interface Citation {
+  id: string;
+  title: string;
+  href: string;
+}
+
 interface Msg {
   role: "user" | "assistant";
   text: string;
   action?: CopilotAnswer["action"];
+  citations?: Citation[];
 }
 
 /** Floating infrastructure copilot. Deterministic today (see intents.ts);
@@ -42,10 +49,16 @@ export function Copilot() {
       const data = (await res.json()) as {
         text: string;
         action?: CopilotAnswer["action"] | null;
+        citations?: Citation[];
       };
       setMsgs((m) => [
         ...m,
-        { role: "assistant", text: data.text, action: data.action ?? undefined },
+        {
+          role: "assistant",
+          text: data.text,
+          action: data.action ?? undefined,
+          citations: data.citations,
+        },
       ]);
     } catch {
       const { runtime, incidents } = useTwinStore.getState();
@@ -92,6 +105,23 @@ export function Copilot() {
                   )}
                 >
                   {m.text}
+                  {m.citations && m.citations.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {m.citations.map((c) => (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onClick={() => {
+                            router.push(c.href);
+                            setOpen(false);
+                          }}
+                          className="rounded-lg border border-hairline bg-raised px-2 py-0.5 text-[11px] text-accent transition-colors hover:border-accent/40"
+                        >
+                          📄 {c.title}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                   {m.action && (
                     <button
                       type="button"
