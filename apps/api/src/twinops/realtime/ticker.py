@@ -18,9 +18,19 @@ async def run_ticker() -> None:
     log.info("ticker_started", interval_s=TICK_SECONDS)
     while True:
         await asyncio.sleep(TICK_SECONDS)
-        twin_service.advance()
-        incident_service.evaluate(twin_service.health, twin_service.tick)
-        await manager.broadcast(
+        try:
+            await _tick()
+        except asyncio.CancelledError:
+            raise
+        except Exception:
+            # A bad tick must never kill the loop — the app would silently freeze.
+            log.exception("tick_failed", tick=twin_service.tick)
+
+
+async def _tick() -> None:
+    twin_service.advance()
+    incident_service.evaluate(twin_service.health, twin_service.tick)
+    await manager.broadcast(
             {
                 "topic": "twin.health",
                 "type": "delta",

@@ -44,6 +44,16 @@ async def _validation_error(request: Request, exc: Exception) -> JSONResponse:
     )
 
 
+async def _unhandled_error(request: Request, exc: Exception) -> JSONResponse:
+    trace_id = _trace_id(request)
+    return JSONResponse(
+        status_code=500,
+        content=_body("internal_error", "internal server error", trace_id),
+        headers=_headers(trace_id),
+    )
+
+
 def register_error_handlers(app: FastAPI) -> None:
     app.add_exception_handler(StarletteHTTPException, _http_error)
     app.add_exception_handler(RequestValidationError, _validation_error)
+    app.add_exception_handler(Exception, _unhandled_error)
