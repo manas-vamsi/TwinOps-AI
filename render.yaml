@@ -5,7 +5,7 @@ services:
     name: twinops-api
     runtime: docker
     dockerfilePath: ./apps/api/Dockerfile
-    dockerContext: ./apps/api
+    dockerContext: .
     plan: free
     healthCheckPath: /healthz
     envVars:
