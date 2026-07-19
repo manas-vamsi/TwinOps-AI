@@ -19,7 +19,7 @@ Monitoring tools answer *"what happened?"*. TwinOps AI answers **why it happened
 - **Live Digital Twin** — an interactive dependency graph of servers, databases, APIs, queues, and services; every node health-tinted in real time, failures visibly cascading along dependency edges.
 - **Explainable AI incident pipeline** — six cooperating agents (monitoring → investigation → knowledge → prediction → recommendation → reporting) produce a root cause with **evidence-weighted confidence**, cited runbooks, recommended actions, and an ETA. The confidence number is *computed from evidence, never hallucinated*.
 - **Deterministic simulation engine** — a seeded, replayable simulation of a realistic enterprise topology (30–200 nodes) with 8 scripted failure scenarios drives the entire product. Same seed + same scenario = identical run: that one property powers reproducible demos, incident replay, and honest tests.
-- **Knowledge Hub** — a searchable runbook library; the AI root cause links straight to the runbook that fixes each incident. (Keyword search today; semantic RAG is the next layer.)
+- **Knowledge Hub** — a searchable runbook library with **hybrid search** (keyword + local Ollama-embedding semantic ranking, graceful keyword fallback); the AI root cause links straight to the runbook that fixes each incident.
 
 ## The demo moment
 
@@ -50,7 +50,7 @@ All eight surfaces are live and driven by real data:
 - **Dashboard** — global health, active incidents, and **predicted failures** ("likely critical in ~Ns").
 - **AI Agents** — the six-agent pipeline visualized working the live incident.
 - **Knowledge Hub** · **Infrastructure** · **Analytics** · **Settings** — searchable runbooks, live inventory, MTTR/frequency/severity, and provider + sim-seed config.
-- **Copilot** — a floating assistant that answers from live state (LLM-backed, deterministic fallback) and navigates the app.
+- **Copilot / unified NL search** — a floating assistant grounded in live state **and** the runbook corpus; ask "why is payment slow?" and the answer **cites the runbooks** it drew on (clickable chips into the Knowledge Hub). LLM-backed with a deterministic fallback; navigates the app.
 
 ## Runs for $0
 
@@ -73,7 +73,8 @@ Prereqs: Node 22+, pnpm, [uv](https://docs.astral.sh/uv/), Docker.
 - **Snapshot + delta realtime** — REST snapshot, sequenced WebSocket deltas, seq-gap re-snapshot, backoff reconnect; one app-wide socket.
 - **Single source of truth contracts** — Pydantic → OpenAPI → generated TypeScript types, enforced by a CI drift gate so frontend and backend can't diverge.
 - **Security** — secrets server-side only (never bundled to the browser), per-IP rate limiting on mutating + LLM endpoints, prompt-injection-guarded LLM prompts, input validation at every boundary.
-- **Tested** — 42 automated tests (pytest + vitest), strict typing (pyright + tsc), ruff + eslint, all run in GitHub Actions on every push.
+- **Resilient by design** — supervised background ticker (a bad tick can never silently freeze the app), per-provider LLM circuit breakers, response caching, RFC-7807 errors with trace IDs, `/readyz` subsystem health, and `restart: unless-stopped` across services.
+- **Tested** — 71 automated tests (pytest + vitest), strict typing (pyright + tsc), ruff + eslint, all run in GitHub Actions on every push.
 - **$0, local-first** — one `docker compose up`; no paid API key required to run.
 
 ## Documentation
